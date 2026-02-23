@@ -17,17 +17,16 @@ import lombok.Setter;
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id")
-    @SequenceGenerator(name = "user_id", sequenceName = "user_id_seq", allocationSize = 1)
-    public long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
 
     @Column(name = "name")
-    public String name;
+    private String name;
 
     @Column(name = "second_name")
-    public String secondName;
+    private String secondName;
 
 
     @Column(name = "surname")
-    public String surname;
+    private String surname;
 }

@@ -1,6 +1,7 @@
 package org.example.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.dto.CreateTaskRequest;
 import org.example.dto.ModifyTaskRequest;
 import org.example.entities.TaskEntity;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TaskService {
     private final TaskRepository taskRepository;
 
@@ -22,6 +24,7 @@ public class TaskService {
         newTask.setCreationTime(LocalDateTime.now());
         newTask.setLastUpdateTime(LocalDateTime.now());
         taskRepository.save(newTask);
+        log.info("Created task with id {}", newTask.getId());
     }
 
     public void modifyTask(long id, ModifyTaskRequest modifyTaskRequest) {

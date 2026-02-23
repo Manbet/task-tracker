@@ -20,27 +20,26 @@ public class TaskEntity {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id")
-    @SequenceGenerator(name = "id", sequenceName = "id_seq", allocationSize = 1)
-    public long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
 
     @Column(name = "title")
-    public String title;
+    private String title;
 
     @Column(name = "description")
-    public String description;
+    private String description;
 
     @Column(name = "creation_time")
-    public LocalDateTime creationTime;
+    private LocalDateTime creationTime;
 
     @Column(name = "last_update_time")
-    public LocalDateTime lastUpdateTime;
+    private LocalDateTime lastUpdateTime;
 
     @Column(name = "due_time")
-    public LocalDateTime dueTime;
+    private LocalDateTime dueTime;
 
     @Column(name = "comment")
-    public String comment;
+    private String comment;
 
 //    @Column(name = "executor")
 //    private UserEntity executor;

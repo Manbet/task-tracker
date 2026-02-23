@@ -3,7 +3,7 @@ services:
   task-tracker-postgres:
     image: postgres:16.3
     environment:
-      POSTGRES_DB: "bank-app"
+      POSTGRES_DB: "task-tracker"
       POSTGRES_USER: "admin"
       POSTGRES_PASSWORD: "admin"
     ports:
