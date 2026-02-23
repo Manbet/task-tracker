@@ -25,19 +25,19 @@ public class TaskEntity {
     public long id;
 
     @Column(name = "title")
-    public String name;
+    public String title;
 
     @Column(name = "description")
     public String description;
 
-    @Column(name = "creationTime")
+    @Column(name = "creation_time")
     public LocalDateTime creationTime;
 
-    @Column(name = "lastUpdateTime")
+    @Column(name = "last_update_time")
     public LocalDateTime lastUpdateTime;
 
-    @Column(name = "dueDate")
-    public LocalDateTime dueDate;
+    @Column(name = "due_time")
+    public LocalDateTime dueTime;
 
     @Column(name = "comment")
     public String comment;

@@ -3,12 +3,9 @@ package org.example.controllers;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.CreateTaskRequest;
 import org.example.dto.ModifyTaskRequest;
+import org.example.entities.TaskEntity;
 import org.example.services.TaskService;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,5 +21,10 @@ public class TaskController {
     public void modifyTask(@PathVariable long id,
                            @RequestBody ModifyTaskRequest modifyTaskRequest) {
         taskService.modifyTask(id, modifyTaskRequest);
+    }
+
+    @GetMapping("/tasks/{id}")
+    public TaskEntity getTask(@PathVariable long id) {
+        return taskService.findById(id);
     }
 }

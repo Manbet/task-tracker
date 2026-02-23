@@ -16,9 +16,9 @@ public class TaskService {
 
     public void createTask(CreateTaskRequest createTaskRequest) {
         final TaskEntity newTask = new TaskEntity();
-        newTask.setName(createTaskRequest.getName());
+        newTask.setTitle(createTaskRequest.getName());
         newTask.setDescription(createTaskRequest.getDescription());
-        newTask.setDueDate(createTaskRequest.getDueDate());
+        newTask.setDueTime(createTaskRequest.getDueDate());
         newTask.setCreationTime(LocalDateTime.now());
         newTask.setLastUpdateTime(LocalDateTime.now());
         taskRepository.save(newTask);
@@ -28,7 +28,11 @@ public class TaskService {
         final TaskEntity task = taskRepository.findById(id).orElse(new TaskEntity());
         task.setComment(modifyTaskRequest.getComment());
         task.setDescription(modifyTaskRequest.getDescription());
-        task.setDueDate(modifyTaskRequest.getDueDate());
+        task.setDueTime(modifyTaskRequest.getDueDate());
         taskRepository.save(task);
+    }
+
+    public TaskEntity findById(long id) {
+        return taskRepository.findById(id).orElse(new TaskEntity());
     }
 }
