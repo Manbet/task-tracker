@@ -3,9 +3,11 @@ package org.example.controllers;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.CreateTaskRequest;
 import org.example.dto.ModifyTaskRequest;
-import org.example.entities.TaskEntity;
+import org.example.dto.TaskResponse;
 import org.example.services.TaskService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +26,22 @@ public class TaskController {
     }
 
     @GetMapping("/tasks/{id}")
-    public TaskEntity getTask(@PathVariable long id) {
+    public TaskResponse getTask(@PathVariable long id) {
         return taskService.findById(id);
+    }
+
+    @GetMapping("/all-tasks")
+    public List<TaskResponse> getAllTasks() {
+        return taskService.findAll();
+    }
+
+    @DeleteMapping("/tasks/delete/{id}")
+    public void deleteTask(@PathVariable long id) {
+        taskService.deleteTask(id);
+    }
+
+    @DeleteMapping("/all-tasks/delete")
+    public void deleteAllTasks() {
+        taskService.deleteAllTasks();
     }
 }

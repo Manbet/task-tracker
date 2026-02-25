@@ -1,12 +1,7 @@
 package org.example.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,6 +19,7 @@ public class TaskEntity {
     private long id;
 
     @Column(name = "title")
+    @NotBlank(message = "Title must not be blank")
     private String title;
 
     @Column(name = "description")
