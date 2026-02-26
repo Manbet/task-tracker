@@ -1,5 +1,7 @@
 package org.example.controllers;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.CreateTaskRequest;
 import org.example.dto.ModifyTaskRequest;
@@ -15,13 +17,13 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping("/tasks")
-    public void createTask(@RequestBody CreateTaskRequest createTaskRequest) {
+    public void createTask(@Valid @RequestBody CreateTaskRequest createTaskRequest) {
         taskService.createTask(createTaskRequest);
     }
 
     @PutMapping("/tasks/{id}")
     public void modifyTask(@PathVariable long id,
-                           @RequestBody ModifyTaskRequest modifyTaskRequest) {
+                           @Valid @RequestBody ModifyTaskRequest modifyTaskRequest) {
         taskService.modifyTask(id, modifyTaskRequest);
     }
 
