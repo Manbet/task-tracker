@@ -14,6 +14,8 @@ public class TaskResponse {
     private final LocalDateTime lastUpdateTime;
     private final LocalDateTime dueTime;
     private final String comment;
+    private final String reporter;
+    private final String assignee;
 
     public TaskResponse(TaskEntity taskEntity) {
         this.id = taskEntity.getId();
@@ -23,5 +25,7 @@ public class TaskResponse {
         this.lastUpdateTime = taskEntity.getLastUpdateTime();
         this.dueTime = taskEntity.getDueTime();
         this.comment = taskEntity.getComment();
+        this.reporter = taskEntity.getReporter().getName();
+        this.assignee = taskEntity.getAssignee().getName();
     }
 }

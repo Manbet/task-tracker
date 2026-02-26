@@ -40,8 +40,9 @@ public class TaskService {
     }
 
     public TaskResponse findById(long id) {
-        TaskResponse taskResponse = new TaskResponse(taskRepository.findById(id).orElseThrow(
-                () -> new NoSuchTasksException("No task with id " + id)));
+        final var taskEntity = taskRepository.findById(id).orElseThrow(
+                () -> new NoSuchTasksException("No task with id " + id));
+        TaskResponse taskResponse = new TaskResponse(taskEntity);
         log.info("Found task with id {}", id);
         return  taskResponse;
     }
