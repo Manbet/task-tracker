@@ -12,6 +12,4 @@ public class ModifyTaskRequest {
     private final String comment;
     @NotBlank(message = "Description must not be blank")
     private final String description;
-    @NotNull(message = "DueDate must not be null")
-    private final LocalDateTime dueDate;
 }

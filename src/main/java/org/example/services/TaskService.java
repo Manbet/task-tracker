@@ -2,7 +2,7 @@ package org.example.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.NoSuchTasksException;
+import org.example.exceptions.NoSuchTasksException;
 import org.example.dto.CreateTaskRequest;
 import org.example.dto.ModifyTaskRequest;
 import org.example.dto.TaskResponse;
@@ -22,7 +22,6 @@ public class TaskService {
     public void createTask(CreateTaskRequest createTaskRequest) {
         final TaskEntity newTask = new TaskEntity();
         newTask.setTitle(createTaskRequest.getTitle());
-        newTask.setDescription(createTaskRequest.getDescription());
         newTask.setDueTime(createTaskRequest.getDueDate());
         newTask.setCreationTime(LocalDateTime.now());
         newTask.setLastUpdateTime(LocalDateTime.now());
@@ -34,7 +33,6 @@ public class TaskService {
         final TaskEntity task = taskRepository.findById(id).orElseThrow(()  -> new NoSuchTasksException("No task with id " + id));
         task.setComment(modifyTaskRequest.getComment());
         task.setDescription(modifyTaskRequest.getDescription());
-        task.setDueTime(modifyTaskRequest.getDueDate());
         taskRepository.save(task);
         log.info("Modified task with id {}", task.getId());
     }
@@ -48,8 +46,9 @@ public class TaskService {
     }
 
     public List<TaskResponse> findAll() {
+        List<TaskEntity> taskEntities = taskRepository.findAll();
         List<TaskResponse> taskResponses = taskRepository.findAll().stream().map(TaskResponse::new).toList();
-        log.info("Found {} tasks", taskRepository.findAll().size());
+        log.info("Found {} tasks", taskEntities.size());
         return taskResponses;
     }
 

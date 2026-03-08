@@ -1,11 +1,11 @@
-package org.example;
+package org.example.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class NoSuchTasksException extends RuntimeException {
-    public NoSuchTasksException(String message) {
+public class NoSuchUserException extends RuntimeException {
+    public NoSuchUserException(String message) {
         super(message);
     }
 }
