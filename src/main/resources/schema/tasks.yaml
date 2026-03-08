@@ -1,0 +1,426 @@
+openapi: 3.0.3
+info:
+  title: Task Management API
+  description: API для управления задачами с валидацией полей
+  version: 1.0.0
+  contact:
+    name: Support
+    email: support@example.com
+
+servers:
+  - url: https://api.example.com/v1
+    description: Production server
+  - url: http://localhost:8080/v1
+    description: Local development server
+
+tags:
+  - name: Tasks
+    description: Операции с задачами
+
+paths:
+  /tasks:
+    get:
+      tags: [Tasks]
+      summary: Получить список задач
+      operationId: listTasks
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+          description: Номер страницы
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Размер страницы
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/StatusCode'
+          description: Фильтр по статусу
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+                  page:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags: [Tasks]
+      summary: Создать новую задачу
+      operationId: createTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreate'
+      responses:
+        '201':
+          description: Задача создана
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URL созданной задачи
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /tasks/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+        description: ID задачи
+
+    get:
+      tags: [Tasks]
+      summary: Получить задачу по ID
+      operationId: getTask
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags: [Tasks]
+      summary: Полностью обновить задачу
+      operationId: updateTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdate'
+      responses:
+        '200':
+          description: Задача обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags: [Tasks]
+      summary: Удалить задачу
+      operationId: deleteTask
+      responses:
+        '204':
+          description: Задача удалена
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    # === Основные модели ===
+
+    Task:
+      type: object
+      required: [id, title, dueDate, status, reporter, watchers]
+      properties:
+        id:
+          type: integer
+          minimum: 1
+          description: Уникальный идентификатор задачи (генерируется сервером)
+          readOnly: true
+        title:
+          type: string
+          minLength: 2
+          maxLength: 200
+          description: Заголовок задачи
+        dueDate:
+          type: string
+          pattern: '^\d{2}\.\d{2}\.\d{4}$'
+          example: "01.01.1970"
+          description: Дата окончания в формате ДД.ММ.ГГГГ
+        difficulty:
+          $ref: '#/components/schemas/Difficulty'
+        status:
+          $ref: '#/components/schemas/Status'
+        reporter:
+          type: integer
+          minimum: 1
+          description: ID автора задачи
+        assignee:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: ID исполнителя задачи
+        watchers:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          maxItems: 1000
+          uniqueItems: true
+          nullable: true
+          description: Список ID наблюдателей
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Дата создания задачи
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Дата последнего обновления
+
+    TaskCreate:
+      type: object
+      required: [title, dueDate, status, reporter]
+      properties:
+        title:
+          type: string
+          minLength: 2
+          maxLength: 200
+          description: Заголовок задачи
+        dueDate:
+          type: string
+          pattern: '^\d{2}\.\d{2}\.\d{4}$'
+          example: "01.01.1970"
+          description: Дата окончания в формате ДД.ММ.ГГГГ
+        difficulty:
+          $ref: '#/components/schemas/Difficulty'
+        status:
+          $ref: '#/components/schemas/Status'
+        reporter:
+          type: integer
+          minimum: 1
+          description: ID автора задачи
+        assignee:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: ID исполнителя задачи
+        watchers:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          maxItems: 1000
+          uniqueItems: true
+          nullable: true
+          description: Список ID наблюдателей
+
+    TaskUpdate:
+      type: object
+      required: [title, dueDate, status, reporter]
+      properties:
+        title:
+          type: string
+          minLength: 2
+          maxLength: 200
+        dueDate:
+          type: string
+          pattern: '^\d{2}\.\d{2}\.\d{4}$'
+          example: "01.01.1970"
+        difficulty:
+          $ref: '#/components/schemas/Difficulty'
+        status:
+          $ref: '#/components/schemas/Status'
+        reporter:
+          type: integer
+          minimum: 1
+        assignee:
+          type: integer
+          minimum: 1
+          nullable: true
+        watchers:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          maxItems: 1000
+          uniqueItems: true
+          nullable: true
+
+    TaskPartialUpdate:
+      type: object
+      description: Поля для частичного обновления (все опциональны)
+      properties:
+        title:
+          type: string
+          minLength: 2
+          maxLength: 200
+        dueDate:
+          type: string
+          pattern: '^\d{2}\.\d{2}\.\d{4}$'
+          example: "01.01.1970"
+        difficulty:
+          $ref: '#/components/schemas/Difficulty'
+        status:
+          $ref: '#/components/schemas/Status'
+        reporter:
+          type: integer
+          minimum: 1
+        assignee:
+          type: integer
+          minimum: 1
+          nullable: true
+        watchers:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          maxItems: 1000
+          uniqueItems: true
+          nullable: true
+
+    # === Вложенные типы ===
+
+    Status:
+      type: object
+      required: [code, description]
+      properties:
+        code:
+          $ref: '#/components/schemas/StatusCode'
+        description:
+          type: string
+          minLength: 1
+          description: Текстовое описание статуса
+      additionalProperties: false
+
+    StatusCode:
+      type: integer
+      enum: [1, 2, 3]
+      x-enum-descriptions:
+        1: "в работе"
+        2: "сделано"
+        3: "отказ"
+      description: Код статуса задачи
+
+    Difficulty:
+      type: integer
+      enum: [1, 2, 3]
+      nullable: true
+      x-enum-descriptions:
+        1: "легко"
+        2: "средне"
+        3: "сложно"
+      description: Уровень сложности задачи
+
+    # === Ошибки ===
+
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          description: Код ошибки для программной обработки
+        message:
+          type: string
+          description: Человекочитаемое описание ошибки
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          description: Детали валидации (если применимо)
+
+    ValidationError:
+      type: object
+      properties:
+        field:
+          type: string
+          description: Поле, в котором произошла ошибка
+        message:
+          type: string
+          description: Описание ошибки
+        rejectedValue:
+          description: Значение, которое не прошло валидацию
+
+  responses:
+    BadRequest:
+      description: Некорректный запрос
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "Запрос содержит синтаксическую ошибку"
+
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "Задача с указанным ID не найдена"
+
+    ValidationFailed:
+      description: Ошибка валидации данных
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "VALIDATION_FAILED"
+            message: "Некоторые поля не прошли валидацию"
+            errors:
+              - field: "title"
+                message: "длина должна быть от 2 до 200 символов"
+                rejectedValue: "a"
+
+    InternalServerError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "INTERNAL_ERROR"
+            message: "Произошла непредвиденная ошибка"
