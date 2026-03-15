@@ -25,7 +25,7 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "username")
+    @Column(name = "name")
     private String username;
 
     @OneToMany(mappedBy = "reporter")

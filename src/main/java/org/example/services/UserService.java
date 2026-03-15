@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
+//    private final TaskRepository taskRepository;
     private final UserRepository userRepository;
 
     public void createUser(CreateUserRequest createUserRequest) {
@@ -23,12 +24,13 @@ public class UserService {
         log.info("Created user with id {}", userEntity.getId());
     }
 
+    // Как добавить существующее TaskEntity без имплементации TaskRepository?
     public void modifyUser(ModifyUserRequest modifyUserRequest, long id) {
         UserEntity entity = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchUserException("User with id " + id + " does not exist"));
-        entity.getAssignedTasks().add(modifyUserRequest.getAssignedTask());
-        entity.getReportedTasks().add(modifyUserRequest.getReportedTask());
-        entity.getWatchedTasks().add(modifyUserRequest.getWatchedTask());
+//        entity.getAssignedTasks().add();
+//        entity.getReportedTasks().add();
+//        entity.getWatchedTasks().add();
         userRepository.save(entity);
         log.info("Modified user with id {}", id);
     }

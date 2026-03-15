@@ -2,6 +2,8 @@ package org.example.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.dto.CreateUserRequest;
+import org.example.entities.UserEntity;
 import org.example.exceptions.NoSuchTasksException;
 import org.example.dto.CreateTaskRequest;
 import org.example.dto.ModifyTaskRequest;
@@ -30,7 +32,8 @@ public class TaskService {
     }
 
     public void modifyTask(long id, ModifyTaskRequest modifyTaskRequest) {
-        final TaskEntity task = taskRepository.findById(id).orElseThrow(()  -> new NoSuchTasksException("No task with id " + id));
+        final TaskEntity task = taskRepository.findById(id)
+                .orElseThrow(() -> new NoSuchTasksException("No task with id " + id));
         task.setComment(modifyTaskRequest.getComment());
         task.setDescription(modifyTaskRequest.getDescription());
         taskRepository.save(task);
@@ -38,11 +41,11 @@ public class TaskService {
     }
 
     public TaskResponse findById(long id) {
-        final var taskEntity = taskRepository.findById(id).orElseThrow(
-                () -> new NoSuchTasksException("No task with id " + id));
+        final var taskEntity = taskRepository.findById(id)
+                .orElseThrow(() -> new NoSuchTasksException("No task with id " + id));
         TaskResponse taskResponse = new TaskResponse(taskEntity);
         log.info("Found task with id {}", id);
-        return  taskResponse;
+        return taskResponse;
     }
 
     public List<TaskResponse> findAll() {
@@ -61,6 +64,4 @@ public class TaskService {
         taskRepository.deleteAll();
         log.info("Deleted all tasks");
     }
-
-
 }

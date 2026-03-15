@@ -53,7 +53,7 @@ public class TaskEntity {
     private UserEntity reporter;
 
     @ManyToOne
-    @JoinColumn(name = "reporter", referencedColumnName = "id")
+    @JoinColumn(name = "assignee", referencedColumnName = "id")
     private UserEntity assignee;
 
     @ManyToMany

@@ -10,4 +10,5 @@ public class CreateTaskRequest {
     @NotBlank(message = "Title must not be blank")
     private final String title;
     private final LocalDateTime dueDate;
+    private final String description;
 }

@@ -1,5 +1,6 @@
 package org.example.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.CreateUserRequest;
 import org.example.dto.ModifyUserRequest;
@@ -18,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/users")
-    public void createUser(@RequestBody CreateUserRequest createUserRequest) {
+    @PostMapping("/users/create")
+    public void createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
         userService.createUser(createUserRequest);
     }
 
@@ -29,7 +30,7 @@ public class UserController {
     }
 
     @PutMapping("user/{id}")
-    public void putUser(@RequestBody ModifyUserRequest modifyUserRequest, @PathVariable long id) {
+    public void putUser(@Valid @RequestBody ModifyUserRequest modifyUserRequest, @PathVariable long id) {
         userService.modifyUser(modifyUserRequest, id);
     }
 

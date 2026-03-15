@@ -16,7 +16,7 @@ import java.util.List;
 public class TaskController {
     private final TaskService taskService;
 
-    @PostMapping("/tasks")
+    @PostMapping("/tasks/create")
     public void createTask(@Valid @RequestBody CreateTaskRequest createTaskRequest) {
         taskService.createTask(createTaskRequest);
     }
