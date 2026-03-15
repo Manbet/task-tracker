@@ -1,10 +1,9 @@
-create table if not exists tasks
-(
-    id               bigserial primary key,
-    title            varchar(255)                not null,
-    description      text,
-    comment          varchar(255),
-    creation_time    timestamp without time zone not null,
+create table if not exists tasks (
+    id bigserial primary key,
+    title varchar(255) not null,
+    description text not null,
+    comment varchar(255),
+    creation_time timestamp without time zone not null,
     last_update_time timestamp without time zone not null,
     due_time         timestamp without time zone not null,
     reporter         bigint,
@@ -37,14 +36,8 @@ create table if not exists task_watchers
 --1        | 2
 --4        | 1
 
-select *
-from tasks t
-         join users u on t.reporter = u.id
-where u.name = 'Павел';
-select *
-from tasks t
-         join users u on t.assignee = u.id
-where u.name = 'Петр';
+select * from tasks t join users u on t.reporter = u.id where u.name = 'Павел';
+select * from tasks t join users u on t.assignee = u.id where u.name = 'Петр';
 
 --many to many
 --task_id | user_id
@@ -55,14 +48,12 @@ where u.name = 'Петр';
 --6       | 1
 --6       | 4
 
-select t.*
-from tasks t
-         join task_watchers tw on t.id = tw.task_id
-         join users u on tw.user_id = u.id
+select t.* from tasks t
+    join task_watchers tw on t.id = tw.task_id
+    join users u on tw.user_id = u.id
 where u.name = 'Эмин';
 
-select u.*
-from tasks t
-         join task_watchers tw on t.id = tw.task_id
-         join users u on tw.user_id = u.id
+select u.* from tasks t
+    join task_watchers tw on t.id = tw.task_id
+    join users u on tw.user_id = u.id
 where t.title = 'разбор ошибок';

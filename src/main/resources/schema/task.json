@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TaskSchema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 200,
+      "description": "Заголовок задачи (2-200 символов)"
+    },
+    "dueDate": {
+      "type": "string",
+      "pattern": "^\\d{2}\\.\\d{2}\\.\\d{4}$",
+      "description": "Дата окончания в формате ДД.ММ.ГГГГ"
+    },
+    "difficulty": {
+      "type": "integer"
+      "enum": [1, 2, 3],
+      "description": "Уровень сложности: 1 - легко, 2 - средне, 3 - сложно"
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "enum": [1, 2, 3],
+          "description": "Код статуса: 1 - в работе, 2 - сделано, 3 - отказ"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Текстовое описание статуса"
+        }
+      },
+      "required": ["code", "description"],
+      "additionalProperties": false
+    },
+    "reporter": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "ID автора задачи"
+    },
+    "assignee": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "ID исполнителя задачи (опционально)"
+    },
+    "watchers": {
+      "type": "array",
+      "description": "Список ID наблюдателей",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "maxItems": 1000,
+      "uniqueItems": true
+    }
+  },
+  "required": ["title", "dueDate", "status", "reporter"],
+  "additionalProperties": false
+}

@@ -50,7 +50,7 @@ public class TaskService {
 
     public List<TaskResponse> findAll() {
         List<TaskEntity> taskEntities = taskRepository.findAll();
-        List<TaskResponse> taskResponses = taskRepository.findAll().stream().map(TaskResponse::new).toList();
+        List<TaskResponse> taskResponses = taskEntities.stream().map(TaskResponse::new).toList();
         log.info("Found {} tasks", taskEntities.size());
         return taskResponses;
     }
