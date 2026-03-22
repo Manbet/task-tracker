@@ -3,9 +3,7 @@ package org.example.controllers;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.example.dto.CreateTaskRequest;
-import org.example.dto.ModifyTaskRequest;
-import org.example.dto.TaskResponse;
+import org.example.dto.*;
 import org.example.services.TaskService;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,10 +19,19 @@ public class TaskController {
         taskService.createTask(createTaskRequest);
     }
 
-    @PutMapping("/tasks/{id}")
-    public void modifyTask(@PathVariable long id,
-                           @Valid @RequestBody ModifyTaskRequest modifyTaskRequest) {
-        taskService.modifyTask(id, modifyTaskRequest);
+    @PutMapping("/tasks/modify")
+    public void modifyTask(@Valid @RequestBody ModifyTaskRequest modifyTaskRequest) {
+        taskService.modifyTask(modifyTaskRequest);
+    }
+
+    @PutMapping("/task/assign")
+    public void changeAssignee(@Valid @RequestBody ChangeAssigneeRequest changeAssigneeRequest) {
+        taskService.changeAssignee(changeAssigneeRequest);
+    }
+
+    @PutMapping("/task/add-watcher")
+    public void addWatcher(@Valid @RequestBody AddWatcherRequest addWatcherRequest) {
+        taskService.addWatcher(addWatcherRequest);
     }
 
     @GetMapping("/tasks/{id}")

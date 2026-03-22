@@ -29,12 +29,12 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @PutMapping("user/{id}")
-    public void putUser(@Valid @RequestBody ModifyUserRequest modifyUserRequest, @PathVariable long id) {
-        userService.modifyUser(modifyUserRequest, id);
+    @PutMapping("/user/modify")
+    public void putUser(@Valid @RequestBody ModifyUserRequest modifyUserRequest) {
+        userService.modifyUser(modifyUserRequest);
     }
 
-    @DeleteMapping("user/{id}")
+    @DeleteMapping("/user/{id}")
     public void deleteUser(@PathVariable long id) {
         userService.deleteUserById(id);
     }

@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ModifyTaskRequest {
+    private final long taskId;
     @NotBlank(message = "Comment must not be blank")
     private final String comment;
     @NotBlank(message = "Description must not be blank")

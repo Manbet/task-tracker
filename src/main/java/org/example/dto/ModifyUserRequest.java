@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class ModifyUserRequest {
-    private long reportedTaskId;
-    private long assignedTaskId;
-    private long watchedTaskId;
+    private final long id;
+    private final String username;
 }
