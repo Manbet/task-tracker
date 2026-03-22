@@ -6,7 +6,7 @@ import org.example.dto.CreateUserRequest;
 import org.example.dto.ModifyUserRequest;
 import org.example.dto.UserResponse;
 import org.example.entities.UserEntity;
-import org.example.exceptions.NoSuchUserException;
+import org.example.exceptions.NoSuchEntityException;
 import org.example.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,17 +23,17 @@ public class UserService {
         log.info("Created user with id {}", userEntity.getId());
     }
 
-    public void modifyUser(ModifyUserRequest modifyUserRequest) {
-        UserEntity entity = userRepository.findById(modifyUserRequest.getId())
-                .orElseThrow(() -> new NoSuchUserException("User with id " + modifyUserRequest.getId() + " does not exist"));
+    public void modifyUser(long userId, ModifyUserRequest modifyUserRequest) {
+        UserEntity entity = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchEntityException("User with id " + userId + " does not exist"));
         entity.setUsername(modifyUserRequest.getUsername());
         userRepository.save(entity);
-        log.info("Modified user with id {}", modifyUserRequest.getId());
+        log.info("Modified user with id {}", userId);
     }
 
     public UserResponse getUserById(long id) {
         final var userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchUserException("User with id " + id + " not found"));
+                .orElseThrow(() -> new NoSuchEntityException("User with id " + id + " not found"));
         UserResponse userResponse = new UserResponse(userEntity);
         log.info("User with id {} found", userEntity.getId());
         return userResponse;

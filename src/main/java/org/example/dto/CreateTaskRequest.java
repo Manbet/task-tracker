@@ -11,4 +11,5 @@ public class CreateTaskRequest {
     private final String title;
     private final LocalDateTime dueDate;
     private final String description;
+    private final long reporter;
 }

@@ -24,17 +24,17 @@ public class UserController {
         userService.createUser(createUserRequest);
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/users/{id}")
     public UserResponse getUser(@PathVariable long id) {
         return userService.getUserById(id);
     }
 
-    @PutMapping("/user/modify")
-    public void putUser(@Valid @RequestBody ModifyUserRequest modifyUserRequest) {
-        userService.modifyUser(modifyUserRequest);
+    @PutMapping("/users/modify/{id}")
+    public void putUser(@PathVariable long id, @Valid @RequestBody ModifyUserRequest modifyUserRequest) {
+        userService.modifyUser(id, modifyUserRequest);
     }
 
-    @DeleteMapping("/user/{id}")
+    @DeleteMapping("/users/{id}")
     public void deleteUser(@PathVariable long id) {
         userService.deleteUserById(id);
     }

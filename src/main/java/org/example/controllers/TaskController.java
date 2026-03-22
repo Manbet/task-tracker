@@ -1,7 +1,6 @@
 package org.example.controllers;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.*;
 import org.example.services.TaskService;
@@ -19,9 +18,9 @@ public class TaskController {
         taskService.createTask(createTaskRequest);
     }
 
-    @PutMapping("/tasks/modify")
-    public void modifyTask(@Valid @RequestBody ModifyTaskRequest modifyTaskRequest) {
-        taskService.modifyTask(modifyTaskRequest);
+    @PutMapping("/tasks/modify/{id}")
+    public void modifyTask(@PathVariable long id, @Valid @RequestBody ModifyTaskRequest modifyTaskRequest) {
+        taskService.modifyTask(id, modifyTaskRequest);
     }
 
     @PutMapping("/task/assign")
@@ -30,8 +29,13 @@ public class TaskController {
     }
 
     @PutMapping("/task/add-watcher")
-    public void addWatcher(@Valid @RequestBody AddWatcherRequest addWatcherRequest) {
-        taskService.addWatcher(addWatcherRequest);
+    public void addWatcher(@Valid @RequestBody ChangeWatcherRequest changeWatcherRequest) {
+        taskService.addWatcher(changeWatcherRequest);
+    }
+
+    @PutMapping("/task/remove-watcher")
+    public void removeWatcher(@Valid @RequestBody ChangeWatcherRequest changeWatcherRequest) {
+        taskService.removeWatcher(changeWatcherRequest);
     }
 
     @GetMapping("/tasks/{id}")
