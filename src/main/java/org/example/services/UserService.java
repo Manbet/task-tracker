@@ -2,6 +2,7 @@ package org.example.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.Gender;
 import org.example.dto.CreateUserRequest;
 import org.example.dto.ModifyUserRequest;
 import org.example.dto.UserResponse;
@@ -18,7 +19,9 @@ public class UserService {
 
     public void createUser(CreateUserRequest createUserRequest) {
         final UserEntity userEntity = new UserEntity();
-        userEntity.setUsername(createUserRequest.getUsername());
+        userEntity.setName(createUserRequest.getName());
+        userEntity.setSurname(createUserRequest.getSurname());
+        userEntity.setGender(Gender.valueOf(createUserRequest.getGender()));
         userRepository.save(userEntity);
         log.info("Created user with id {}", userEntity.getId());
     }
@@ -26,7 +29,7 @@ public class UserService {
     public void modifyUser(long userId, ModifyUserRequest modifyUserRequest) {
         UserEntity entity = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchEntityException("User with id " + userId + " does not exist"));
-        entity.setUsername(modifyUserRequest.getUsername());
+        entity.setBirthDate(modifyUserRequest.getBirthday());
         userRepository.save(entity);
         log.info("Modified user with id {}", userId);
     }

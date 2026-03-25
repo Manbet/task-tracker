@@ -19,23 +19,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/users/create")
+    @PostMapping("/users")
     public void createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
         userService.createUser(createUserRequest);
     }
 
     @GetMapping("/users/{id}")
-    public UserResponse getUser(@PathVariable long id) {
+    public UserResponse getUser(@Valid @PathVariable long id) {
         return userService.getUserById(id);
     }
 
-    @PutMapping("/users/modify/{id}")
-    public void putUser(@PathVariable long id, @Valid @RequestBody ModifyUserRequest modifyUserRequest) {
+    @PutMapping("/users/{id}")
+    public void putUser(@Valid @PathVariable long id,
+                        @Valid @RequestBody ModifyUserRequest modifyUserRequest) {
         userService.modifyUser(id, modifyUserRequest);
     }
 
     @DeleteMapping("/users/{id}")
-    public void deleteUser(@PathVariable long id) {
+    public void deleteUser(@Valid @PathVariable long id) {
         userService.deleteUserById(id);
     }
 }

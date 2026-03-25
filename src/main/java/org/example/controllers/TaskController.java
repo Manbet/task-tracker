@@ -2,7 +2,10 @@ package org.example.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.dto.*;
+import org.example.dto.ChangeWatcherRequest;
+import org.example.dto.CreateTaskRequest;
+import org.example.dto.ModifyTaskRequest;
+import org.example.dto.TaskResponse;
 import org.example.services.TaskService;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,24 +16,32 @@ import java.util.List;
 public class TaskController {
     private final TaskService taskService;
 
-    @PostMapping("/tasks/create")
+    @PostMapping("/tasks")
     public void createTask(@Valid @RequestBody CreateTaskRequest createTaskRequest) {
         taskService.createTask(createTaskRequest);
     }
 
-    @PutMapping("/tasks/modify/{id}")
-    public void modifyTask(@PathVariable long id, @Valid @RequestBody ModifyTaskRequest modifyTaskRequest) {
+    @PutMapping("/tasks/{id}")
+    public void modifyTask(@Valid @PathVariable long id,
+                           @Valid @RequestBody ModifyTaskRequest modifyTaskRequest) {
         taskService.modifyTask(id, modifyTaskRequest);
     }
 
-    @PutMapping("/task/assign")
-    public void changeAssignee(@Valid @RequestBody ChangeAssigneeRequest changeAssigneeRequest) {
-        taskService.changeAssignee(changeAssigneeRequest);
+    @PutMapping("/task/assign/{taskId}")
+    public void changeAssignee(@Valid @PathVariable long taskId,
+                               @Valid @RequestParam long assigneeId) {
+        taskService.changeAssignee(taskId, assigneeId);
     }
 
-    @PutMapping("/task/add-watcher")
-    public void addWatcher(@Valid @RequestBody ChangeWatcherRequest changeWatcherRequest) {
-        taskService.addWatcher(changeWatcherRequest);
+    @PutMapping("/task/assign/{id}")
+    public void removeAssign(@Valid @PathVariable long id) {
+        taskService.removeAssignee(id);
+    }
+
+    @PutMapping("/task/add-watcher/{taskId}")
+    public void addWatcher(@Valid @PathVariable long taskId,
+                           @Valid @RequestParam long watcherId) {
+        taskService.addWatcher(taskId, watcherId);
     }
 
     @PutMapping("/task/remove-watcher")
@@ -39,7 +50,7 @@ public class TaskController {
     }
 
     @GetMapping("/tasks/{id}")
-    public TaskResponse getTask(@PathVariable long id) {
+    public TaskResponse getTask(@Valid @PathVariable long id) {
         return taskService.findById(id);
     }
 
@@ -48,12 +59,12 @@ public class TaskController {
         return taskService.findAll();
     }
 
-    @DeleteMapping("/tasks/delete/{id}")
-    public void deleteTask(@PathVariable long id) {
+    @DeleteMapping("/tasks/{id}")
+    public void deleteTask(@Valid @PathVariable long id) {
         taskService.deleteTask(id);
     }
 
-    @DeleteMapping("/all-tasks/delete")
+    @DeleteMapping("/tasks")
     public void deleteAllTasks() {
         taskService.deleteAllTasks();
     }

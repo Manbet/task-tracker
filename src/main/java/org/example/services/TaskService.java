@@ -42,21 +42,28 @@ public class TaskService {
         log.info("Modified task with id {}", task.getId());
     }
 
-    public void changeAssignee(ChangeAssigneeRequest request) {
-        final TaskEntity task = taskRepository.findById(request.getTaskId())
-                .orElseThrow(() -> new NoSuchEntityException("No task with id " + request.getTaskId()));
-        final UserEntity assignee = userRepository.findById(request.getAssigneeId())
-                .orElseThrow(() -> new NoSuchEntityException("User with id " + request.getAssigneeId() + " not found"));
+    public void changeAssignee(long taskId, long assigneeId) {
+        final TaskEntity task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NoSuchEntityException("No task with id " + taskId));
+        final UserEntity assignee = userRepository.findById(assigneeId)
+                .orElseThrow(() -> new NoSuchEntityException("User with id " + assigneeId + " not found"));
         task.setAssignee(assignee);
         taskRepository.save(task);
         log.info("Assigned {} as an assignee to a task with id {}", assignee.getId(), task.getId());
     }
 
-    public void addWatcher(ChangeWatcherRequest request) {
-        final TaskEntity task = taskRepository.findById(request.getTaskId())
-                .orElseThrow(() -> new NoSuchEntityException("No task with id " + request.getTaskId()));
-        final UserEntity watcher = userRepository.findById(request.getWatcherId())
-                .orElseThrow(() -> new NoSuchEntityException("User with id " + request.getWatcherId() + " not found"));
+    public void removeAssignee(long taskId) {
+        final TaskEntity task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NoSuchEntityException("No task with id " + taskId));
+        task.setAssignee(null);
+        taskRepository.save(task);
+    }
+
+    public void addWatcher(long  taskId, long watcherId) {
+        final TaskEntity task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NoSuchEntityException("No task with id " + taskId));
+        final UserEntity watcher = userRepository.findById(watcherId)
+                .orElseThrow(() -> new NoSuchEntityException("User with id " + watcherId + " not found"));
         task.getWatchers().add(watcher);
         taskRepository.save(task);
         log.info("Added user {} as a watcher to a task with id {}", watcher.getId(), task.getId());

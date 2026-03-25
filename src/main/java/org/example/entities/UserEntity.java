@@ -1,16 +1,11 @@
 package org.example.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.Gender;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +21,17 @@ public class UserEntity {
     private long id;
 
     @Column(name = "name")
-    private String username;
+    private String name;
+
+    @Column(name = "surname")
+    private String surname;
+
+    @Column(name = "birth_date")
+    private LocalDateTime birthDate;
+
+    @Column(name = "gender")
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @OneToMany(mappedBy = "reporter")
     private List<TaskEntity> reportedTasks = new ArrayList<>();

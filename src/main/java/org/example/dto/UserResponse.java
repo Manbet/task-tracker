@@ -16,7 +16,7 @@ public class UserResponse {
 
     public UserResponse(UserEntity userEntity) {
         this.id = userEntity.getId();
-        this.username = userEntity.getUsername();
+        this.username = userEntity.getName();
         this.reportedTasks = userEntity.getReportedTasks();
         this.assignedTasks = userEntity.getAssignedTasks();
         this.waitingTasks = userEntity.getWatchedTasks();

@@ -6,14 +6,17 @@ create table if not exists tasks (
     creation_time timestamp without time zone not null,
     last_update_time timestamp without time zone not null,
     due_time         timestamp without time zone not null,
-    reporter         bigint,
+    reporter         bigint not null,
     assignee         bigint
 );
 
 create table if not exists users
 (
     id   bigserial primary key,
-    name varchar(255) not null
+    name varchar(255) not null,
+    surname varchar(255) not null,
+    gender varchar(255) not null,
+    birth_date timestamp without time zone not null
 );
 
 create table if not exists task_watchers

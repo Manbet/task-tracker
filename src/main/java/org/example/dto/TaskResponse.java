@@ -25,7 +25,7 @@ public class TaskResponse {
         this.lastUpdateTime = taskEntity.getLastUpdateTime();
         this.dueTime = taskEntity.getDueTime();
         this.comment = taskEntity.getComment();
-        this.reporter = taskEntity.getReporter().getUsername();
-        this.assignee = taskEntity.getAssignee().getUsername();
+        this.reporter = taskEntity.getReporter().getName();
+        this.assignee = taskEntity.getAssignee().getName();
     }
 }
