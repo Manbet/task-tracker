@@ -21,6 +21,7 @@ public class TaskService {
     private final UserRepository userRepository;
 
     public void createTask(CreateTaskRequest createTaskRequest) {
+        log.info("Creating task {}", createTaskRequest);
         final TaskEntity newTask = new TaskEntity();
         final UserEntity reporter = userRepository.findById(createTaskRequest.getReporter())
                 .orElseThrow(() -> new NoSuchEntityException("User with id " + createTaskRequest.getReporter() + " not found"));
@@ -57,6 +58,7 @@ public class TaskService {
                 .orElseThrow(() -> new NoSuchEntityException("No task with id " + taskId));
         task.setAssignee(null);
         taskRepository.save(task);
+        log.info("Removed assignee from a task with id {}", task.getId());
     }
 
     public void addWatcher(long  taskId, long watcherId) {
@@ -95,7 +97,9 @@ public class TaskService {
     }
 
     public void deleteTask(long id) {
-        taskRepository.deleteById(id);
+        TaskEntity task = taskRepository.findById(id).orElseThrow(() -> new NoSuchEntityException("No task with id " + id));
+        task.setActive(false);
+        taskRepository.save(task);
         log.info("Deleted task with id {}", id);
     }
 

@@ -34,7 +34,7 @@ public class TaskController {
     }
 
     @PutMapping("/task/assign/{id}")
-    public void removeAssign(@Valid @PathVariable long id) {
+    public void removeAssignee(@Valid @PathVariable long id) {
         taskService.removeAssignee(id);
     }
 

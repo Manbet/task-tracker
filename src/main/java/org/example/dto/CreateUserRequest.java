@@ -2,6 +2,7 @@ package org.example.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.example.Gender;
 
 @Data
 public class CreateUserRequest {
@@ -10,5 +11,5 @@ public class CreateUserRequest {
     @NotBlank
     private final String surname;
     @NotBlank
-    private final String gender;
+    private final Gender gender;
 }

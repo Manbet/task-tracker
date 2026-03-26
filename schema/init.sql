@@ -3,6 +3,7 @@ create table if not exists tasks (
     title varchar(255) not null,
     description text,
     comment varchar(255),
+    is_active boolean,
     creation_time timestamp without time zone not null,
     last_update_time timestamp without time zone not null,
     due_time         timestamp without time zone not null,

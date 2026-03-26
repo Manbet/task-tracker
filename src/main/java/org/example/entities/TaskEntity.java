@@ -48,6 +48,9 @@ public class TaskEntity {
     @Column(name = "comment")
     private String comment;
 
+    @Column(name = "is_active")
+    private boolean isActive = true;
+
     @ManyToOne
     @JoinColumn(name = "reporter", referencedColumnName = "id")
     private UserEntity reporter;
