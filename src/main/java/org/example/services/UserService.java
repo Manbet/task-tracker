@@ -2,12 +2,13 @@ package org.example.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.Gender;
-import org.example.dto.CreateUserRequest;
-import org.example.dto.ModifyUserRequest;
-import org.example.dto.UserResponse;
+import org.example.dto.requests.CreateUserRequest;
+import org.example.dto.requests.ModifyUserRequest;
+import org.example.dto.responses.UserResponse;
+import org.example.entities.ProjectEntity;
 import org.example.entities.UserEntity;
 import org.example.exceptions.NoSuchEntityException;
+import org.example.repositories.ProjectRepository;
 import org.example.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,17 +17,33 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class UserService {
     private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
 
     public void createUser(CreateUserRequest createUserRequest) {
+        log.info("Creating user: {}", createUserRequest);
         final UserEntity userEntity = new UserEntity();
         userEntity.setName(createUserRequest.getName());
         userEntity.setSurname(createUserRequest.getSurname());
-        userEntity.setGender(Gender.valueOf(createUserRequest.getGender()));
+        userEntity.setGender(createUserRequest.getGender());
         userRepository.save(userEntity);
         log.info("Created user with id {}", userEntity.getId());
     }
 
+    public void assignToProject(long projectId, long userId) {
+        log.info("Assigning to project");
+        final ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new NoSuchEntityException(
+                        "Project with id " + projectId + " not found"));
+        final UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchEntityException(
+                        "User with id " + userId + " not found"));
+        user.getProjects().add(project);
+        userRepository.save(user);
+        log.info("Assigned user with id {}", user.getId());
+    }
+
     public void modifyUser(long userId, ModifyUserRequest modifyUserRequest) {
+        log.info("Modifying user: {}", modifyUserRequest);
         UserEntity entity = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchEntityException("User with id " + userId + " does not exist"));
         entity.setBirthDate(modifyUserRequest.getBirthday());
@@ -35,7 +52,7 @@ public class UserService {
     }
 
     public UserResponse getUserById(long id) {
-        final var userEntity = userRepository.findById(id)
+        final UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchEntityException("User with id " + id + " not found"));
         UserResponse userResponse = new UserResponse(userEntity);
         log.info("User with id {} found", userEntity.getId());
@@ -43,7 +60,12 @@ public class UserService {
     }
 
     public void deleteUserById(long id) {
-        userRepository.deleteById(id);
+        log.info("Deleting user with id {}", id);
+        final UserEntity userEntity = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchEntityException("User with id " + id + " not found"));
+        userEntity.setActive(false);
+        log.info("User active status was changed to false");
+        userRepository.save(userEntity);
         log.info("User with id {} deleted", id);
     }
 }

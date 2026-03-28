@@ -1,18 +1,10 @@
 package org.example.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.enums.TaskStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -48,8 +40,9 @@ public class TaskEntity {
     @Column(name = "comment")
     private String comment;
 
-    @Column(name = "is_active")
-    private boolean isActive = true;
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status;
 
     @ManyToOne
     @JoinColumn(name = "reporter", referencedColumnName = "id")
@@ -58,6 +51,10 @@ public class TaskEntity {
     @ManyToOne
     @JoinColumn(name = "assignee", referencedColumnName = "id")
     private UserEntity assignee;
+
+    @ManyToOne
+    @JoinColumn(name = "project", referencedColumnName = "id")
+    private ProjectEntity project;
 
     @ManyToMany
     @JoinTable(

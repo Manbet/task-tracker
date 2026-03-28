@@ -1,4 +1,4 @@
-package org.example.dto;
+package org.example.dto.responses;
 
 import lombok.Data;
 import org.example.entities.TaskEntity;

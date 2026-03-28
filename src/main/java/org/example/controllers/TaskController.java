@@ -2,10 +2,10 @@ package org.example.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.dto.ChangeWatcherRequest;
-import org.example.dto.CreateTaskRequest;
-import org.example.dto.ModifyTaskRequest;
-import org.example.dto.TaskResponse;
+import org.example.dto.requests.ChangeWatcherRequest;
+import org.example.dto.requests.CreateTaskRequest;
+import org.example.dto.requests.ModifyTaskRequest;
+import org.example.dto.responses.TaskResponse;
 import org.example.services.TaskService;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +25,11 @@ public class TaskController {
     public void modifyTask(@Valid @PathVariable long id,
                            @Valid @RequestBody ModifyTaskRequest modifyTaskRequest) {
         taskService.modifyTask(id, modifyTaskRequest);
+    }
+
+    @PutMapping("/task/status/{id}")
+    public void changeTaskStatus(@Valid @PathVariable long id, @Valid @RequestParam String status) {
+        taskService.changeStatus(id, status);
     }
 
     @PutMapping("/task/assign/{taskId}")
@@ -57,11 +62,6 @@ public class TaskController {
     @GetMapping("/all-tasks")
     public List<TaskResponse> getAllTasks() {
         return taskService.findAll();
-    }
-
-    @DeleteMapping("/tasks/{id}")
-    public void deleteTask(@Valid @PathVariable long id) {
-        taskService.deleteTask(id);
     }
 
     @DeleteMapping("/tasks")

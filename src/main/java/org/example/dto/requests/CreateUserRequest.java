@@ -1,8 +1,8 @@
-package org.example.dto;
+package org.example.dto.requests;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import org.example.Gender;
+import org.example.enums.Gender;
 
 @Data
 public class CreateUserRequest {

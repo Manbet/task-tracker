@@ -2,9 +2,9 @@ package org.example.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.dto.CreateUserRequest;
-import org.example.dto.ModifyUserRequest;
-import org.example.dto.UserResponse;
+import org.example.dto.requests.CreateUserRequest;
+import org.example.dto.requests.ModifyUserRequest;
+import org.example.dto.responses.UserResponse;
 import org.example.services.UserService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,5 +38,11 @@ public class UserController {
     @DeleteMapping("/users/{id}")
     public void deleteUser(@Valid @PathVariable long id) {
         userService.deleteUserById(id);
+    }
+
+    @PutMapping("/users/{user_id}/project/{project_id}")
+    public void assignToProject(@Valid @PathVariable long user_id,
+                                @Valid @PathVariable long project_id) {
+        userService.assignToProject(user_id, project_id);
     }
 }

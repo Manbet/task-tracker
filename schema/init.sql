@@ -3,28 +3,40 @@ create table if not exists tasks (
     title varchar(255) not null,
     description text,
     comment varchar(255),
-    is_active boolean,
+    status text,
     creation_time timestamp without time zone not null,
     last_update_time timestamp without time zone not null,
-    due_time         timestamp without time zone not null,
-    reporter         bigint not null,
-    assignee         bigint
+    due_time timestamp without time zone not null,
+    reporter bigint not null,
+    project bigint not null,
+    assignee bigint
 );
 
-create table if not exists users
-(
+create table if not exists users (
     id   bigserial primary key,
     name varchar(255) not null,
     surname varchar(255) not null,
     gender varchar(255) not null,
-    birth_date timestamp without time zone not null
+    birth_date timestamp without time zone not null,
+    is_active boolean
 );
 
-create table if not exists task_watchers
-(
+create table if not exists projects (
+    id bigserial primary key,
+    name varchar(255) not null,
+    description text
+);
+
+create table if not exists task_watchers (
     task_id bigint not null,
     user_id bigint not null,
     primary key (task_id, user_id)
+);
+
+create table if not exists project_users (
+    project_id bigint not null,
+    user_id bigint not null,
+    primary key(project_id, user_id)
 );
 
 --1, 2, 3, 4

@@ -3,7 +3,7 @@ package org.example.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.Gender;
+import org.example.enums.Gender;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,6 +29,9 @@ public class UserEntity {
     @Column(name = "birth_date")
     private LocalDateTime birthDate;
 
+    @Column(name = "is_active")
+    private boolean isActive;
+
     @Column(name = "gender")
     @Enumerated(EnumType.STRING)
     private Gender gender;
@@ -41,4 +44,7 @@ public class UserEntity {
 
     @ManyToMany(mappedBy = "watchers")
     private List<TaskEntity> watchedTasks = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "users")
+    private List<ProjectEntity> projects = new ArrayList<>();
 }
