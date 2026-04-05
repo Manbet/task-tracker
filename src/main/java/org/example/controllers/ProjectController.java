@@ -19,18 +19,23 @@ public class ProjectController {
         projectService.createProject(createProjectRequest);
     }
 
-    @DeleteMapping("/project/{id}")
-    public void deleteProject(@Valid @PathVariable long id) {
-        projectService.deleteProject(id);
-    }
-
-    @DeleteMapping("/project")
-    public void deleteAllProjects() {
-        projectService.deleteAllProjects();
+    @GetMapping("/project/{id}")
+    public ProjectResponse getProjectById(@PathVariable Long id) {
+        return projectService.getProjectById(id);
     }
 
     @GetMapping("/project")
-    public List<ProjectResponse>  getAllProjects() {
+    public ProjectResponse getProjectByName(@RequestParam String name) {
+        return projectService.getProjectByName(name);
+    }
+
+    @DeleteMapping("/project/{id}")
+    public void deleteProject(@Valid @PathVariable Long id) {
+        projectService.deleteProject(id);
+    }
+
+    @GetMapping("/projects")
+    public List<ProjectResponse> getAllProjects() {
         return projectService.findAllProjects();
     }
 }

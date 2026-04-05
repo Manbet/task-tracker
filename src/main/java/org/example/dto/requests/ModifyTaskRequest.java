@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 public class ModifyTaskRequest {
-    @NotBlank(message = "Comment must not be blank")
+    @NotBlank
     private final String comment;
-    @NotBlank(message = "Description must not be blank")
+    @NotBlank
     private final String description;
 }

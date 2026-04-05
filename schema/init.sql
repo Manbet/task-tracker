@@ -24,6 +24,7 @@ create table if not exists users (
 create table if not exists projects (
     id bigserial primary key,
     name varchar(255) not null,
+    status boolean not null,
     description text
 );
 

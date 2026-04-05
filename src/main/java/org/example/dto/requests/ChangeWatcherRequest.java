@@ -1,9 +1,12 @@
 package org.example.dto.requests;
 
 import lombok.Data;
+import lombok.NonNull;
 
 @Data
 public class ChangeWatcherRequest {
-    private final long taskId;
-    private final long watcherId;
+    @NonNull
+    private final Long taskId;
+    @NonNull
+    private final Long watcherId;
 }

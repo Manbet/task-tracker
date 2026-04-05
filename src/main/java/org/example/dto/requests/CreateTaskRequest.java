@@ -1,6 +1,7 @@
 package org.example.dto.requests;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,8 @@ public class CreateTaskRequest {
     private final String title;
     private final LocalDateTime dueDate;
     private final String description;
-    private final long reporter;
-    private final long projectId;
+    @NotNull
+    private final Long reporter;
+    @NotNull
+    private final Long projectId;
 }

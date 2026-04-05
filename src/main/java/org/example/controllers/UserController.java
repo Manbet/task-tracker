@@ -25,24 +25,24 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    public UserResponse getUser(@Valid @PathVariable long id) {
+    public UserResponse getUser(@Valid @PathVariable Long id) {
         return userService.getUserById(id);
     }
 
     @PutMapping("/users/{id}")
-    public void putUser(@Valid @PathVariable long id,
+    public void putUser(@Valid @PathVariable Long id,
                         @Valid @RequestBody ModifyUserRequest modifyUserRequest) {
         userService.modifyUser(id, modifyUserRequest);
     }
 
     @DeleteMapping("/users/{id}")
-    public void deleteUser(@Valid @PathVariable long id) {
+    public void deleteUser(@Valid @PathVariable Long id) {
         userService.deleteUserById(id);
     }
 
     @PutMapping("/users/{user_id}/project/{project_id}")
-    public void assignToProject(@Valid @PathVariable long user_id,
-                                @Valid @PathVariable long project_id) {
+    public void assignToProject(@Valid @PathVariable Long user_id,
+                                @Valid @PathVariable Long project_id) {
         userService.assignToProject(user_id, project_id);
     }
 }

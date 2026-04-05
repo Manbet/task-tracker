@@ -2,6 +2,7 @@ package org.example.controllers;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.example.exceptions.ForbiddenException;
 import org.example.exceptions.NoSuchEntityException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,6 +27,13 @@ public class AdviceController {
     })
     public String handleValidationException(MethodArgumentNotValidException e) {
         log.info("Handling MethodArgumentNotValidException {}", e.getMessage());
+        return e.getMessage();
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ForbiddenException.class)
+    public String handleForbiddenException(ForbiddenException e) {
+        log.info("Handling ForbiddenException {}", e.getMessage());
         return e.getMessage();
     }
 

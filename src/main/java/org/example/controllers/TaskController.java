@@ -21,31 +21,35 @@ public class TaskController {
         taskService.createTask(createTaskRequest);
     }
 
-    @PutMapping("/tasks/{id}")
-    public void modifyTask(@Valid @PathVariable long id,
+    @PutMapping("/tasks/{taskId}")
+    public void modifyTask(@Valid @PathVariable Long taskId,
+                           @Valid @RequestParam Long userId,
                            @Valid @RequestBody ModifyTaskRequest modifyTaskRequest) {
-        taskService.modifyTask(id, modifyTaskRequest);
+        taskService.modifyTask(taskId, userId, modifyTaskRequest);
     }
 
-    @PutMapping("/task/status/{id}")
-    public void changeTaskStatus(@Valid @PathVariable long id, @Valid @RequestParam String status) {
-        taskService.changeStatus(id, status);
+    @PutMapping("/task/status/{taskId}")
+    public void changeTaskStatus(@Valid @PathVariable Long taskId,
+                                @Valid @RequestParam Long userId,
+                                 @Valid @RequestParam String status) {
+        taskService.changeStatus(taskId, userId, status);
     }
 
     @PutMapping("/task/assign/{taskId}")
-    public void changeAssignee(@Valid @PathVariable long taskId,
-                               @Valid @RequestParam long assigneeId) {
+    public void changeAssignee(@Valid @PathVariable Long taskId,
+                               @Valid @RequestParam Long assigneeId) {
         taskService.changeAssignee(taskId, assigneeId);
     }
 
-    @PutMapping("/task/assign/{id}")
-    public void removeAssignee(@Valid @PathVariable long id) {
-        taskService.removeAssignee(id);
+    @PutMapping("/task/deassign/{taskId}")
+    public void removeAssignee(@Valid @PathVariable Long taskId,
+                               @Valid @RequestParam Long assigneeId) {
+        taskService.removeAssignee(taskId, assigneeId);
     }
 
     @PutMapping("/task/add-watcher/{taskId}")
-    public void addWatcher(@Valid @PathVariable long taskId,
-                           @Valid @RequestParam long watcherId) {
+    public void addWatcher(@Valid @PathVariable Long taskId,
+                           @Valid @RequestParam Long watcherId) {
         taskService.addWatcher(taskId, watcherId);
     }
 
@@ -55,17 +59,12 @@ public class TaskController {
     }
 
     @GetMapping("/tasks/{id}")
-    public TaskResponse getTask(@Valid @PathVariable long id) {
+    public TaskResponse getTask(@Valid @PathVariable Long id) {
         return taskService.findById(id);
     }
 
     @GetMapping("/all-tasks")
     public List<TaskResponse> getAllTasks() {
         return taskService.findAll();
-    }
-
-    @DeleteMapping("/tasks")
-    public void deleteAllTasks() {
-        taskService.deleteAllTasks();
     }
 }
