@@ -30,8 +30,8 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}")
-    public void putUser(@Valid @PathVariable Long id,
-                        @Valid @RequestBody ModifyUserRequest modifyUserRequest) {
+    public void modifyUser(@Valid @PathVariable Long id,
+                           @Valid @RequestBody ModifyUserRequest modifyUserRequest) {
         userService.modifyUser(id, modifyUserRequest);
     }
 

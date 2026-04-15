@@ -24,8 +24,8 @@ public class ProjectEntity {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "status")
-    private boolean status = true;
+    @Column(name = "is_active")
+    private boolean isActive = true;
 
     @OneToMany(mappedBy = "project")
     private List<TaskEntity> tasks = new ArrayList<>();

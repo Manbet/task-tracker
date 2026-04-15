@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class AdviceController {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoSuchEntityException.class)
-    public String handleNoSuchEntityException(NoSuchEntityException e) {
-        log.info("Handling NoSuchEntityException {}", e.getMessage());
-        return e.getMessage();
+    public NoSuchEntityException handleNoSuchEntityException(NoSuchEntityException e) {
+        log.error("Handling NoSuchEntityException {}", e.getMessage());
+        return e;
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -26,21 +26,21 @@ public class AdviceController {
             ConstraintViolationException.class
     })
     public String handleValidationException(MethodArgumentNotValidException e) {
-        log.info("Handling MethodArgumentNotValidException {}", e.getMessage());
+        log.error("Handling MethodArgumentNotValidException {}", e.getMessage());
         return e.getMessage();
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(ForbiddenException.class)
     public String handleForbiddenException(ForbiddenException e) {
-        log.info("Handling ForbiddenException {}", e.getMessage());
+        log.error("Handling ForbiddenException {}", e.getMessage());
         return e.getMessage();
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public String handleException(Exception e) {
-        log.info("Handling Exceptions: {}", e.getMessage());
+        log.error("Handling Exceptions: {}", e.getMessage());
         return e.getMessage();
     }
 }

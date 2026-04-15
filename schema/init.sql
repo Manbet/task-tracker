@@ -17,14 +17,14 @@ create table if not exists users (
     name varchar(255) not null,
     surname varchar(255) not null,
     gender varchar(255) not null,
-    birth_date timestamp without time zone not null,
+    birth_date timestamp without time zone,
     is_active boolean
 );
 
 create table if not exists projects (
     id bigserial primary key,
     name varchar(255) not null,
-    status boolean not null,
+    is_active boolean not null,
     description text
 );
 
