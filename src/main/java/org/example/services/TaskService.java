@@ -81,7 +81,7 @@ public class TaskService {
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("[{0}] No task with id {1}", uuid, taskId)));
         if (task.getProject().getUsers().stream().anyMatch(x -> x.getId() == userId)) {
-            task.setStatus(TaskStatus.valueOf(taskStatus));
+            task.setStatus(TaskStatus.getEnumByLowercaseName(taskStatus, uuid));
             taskRepository.save(task);
             log.info("[{}] Changed status of task with id {}", uuid, task.getId());
         } else {

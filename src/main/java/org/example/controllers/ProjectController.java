@@ -15,8 +15,8 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @PostMapping("/project")
-    public void createProject(@Valid @RequestBody CreateProjectRequest createProjectRequest) {
-        projectService.createProject(createProjectRequest);
+    public void createProject(@Valid @RequestParam String uuid, @Valid @RequestBody CreateProjectRequest createProjectRequest) {
+        projectService.createProject(createProjectRequest, uuid);
     }
 
     @GetMapping("/project/{id}")

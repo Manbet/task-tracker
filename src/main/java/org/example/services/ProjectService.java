@@ -19,8 +19,7 @@ import java.util.UUID;
 public class ProjectService {
     private final ProjectRepository projectRepository;
 
-    public void createProject(CreateProjectRequest createProjectRequest) {
-        String uuid = UUID.randomUUID().toString();
+    public void createProject(CreateProjectRequest createProjectRequest, String uuid) {
         log.info("[{}] Creating project {}", uuid, createProjectRequest);
         ProjectEntity project = new ProjectEntity();
         project.setName(createProjectRequest.getName());
