@@ -28,8 +28,7 @@ public class ProjectService {
         log.info("[{}] Project {} created", uuid, project.getId());
     }
 
-    public void deleteProject(long projectId) {
-        String uuid = UUID.randomUUID().toString();
+    public void deleteProject(long projectId, String uuid) {
         log.info("[{}] Deleting project {}", uuid, projectId);
         final ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
@@ -39,8 +38,7 @@ public class ProjectService {
         log.info("[{}] Project {} deleted", uuid, projectId);
     }
 
-    public ProjectResponse getProjectById(long projectId) {
-        String uuid = UUID.randomUUID().toString();
+    public ProjectResponse getProjectById(long projectId, String uuid) {
         log.info("[{}] Getting project by id{}", uuid, projectId);
         final ProjectEntity projectEntity = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
@@ -49,8 +47,7 @@ public class ProjectService {
         return new ProjectResponse(projectEntity);
     }
 
-    public ProjectResponse getProjectByName(String name) {
-        String uuid = UUID.randomUUID().toString();
+    public ProjectResponse getProjectByName(String name, String uuid) {
         log.info("[{}] Getting project by name {}", uuid, name);
         final ProjectEntity projectEntity = projectRepository.findByName(name);
         if (projectEntity == null) {
@@ -61,8 +58,7 @@ public class ProjectService {
         return new ProjectResponse(projectEntity);
     }
 
-    public List<ProjectResponse> findAllProjects() {
-        String uuid = UUID.randomUUID().toString();
+    public List<ProjectResponse> findAllProjects(String uuid) {
         log.info("[{}] Finding all projects", uuid);
         List<ProjectEntity> projects = projectRepository.findAll();
         List<ProjectResponse> projectResponses = projects.stream().map(ProjectResponse::new).toList();

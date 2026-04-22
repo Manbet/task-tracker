@@ -4,6 +4,7 @@ import lombok.Data;
 import org.example.entities.TaskEntity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class TaskResponse {
@@ -13,7 +14,7 @@ public class TaskResponse {
     private final LocalDateTime creationTime;
     private final LocalDateTime lastUpdateTime;
     private final LocalDateTime dueTime;
-    private final String comment;
+    private final List<String> comments;
     private final String reporter;
     private final String assignee;
 
@@ -24,7 +25,7 @@ public class TaskResponse {
         this.creationTime = taskEntity.getCreationTime();
         this.lastUpdateTime = taskEntity.getLastUpdateTime();
         this.dueTime = taskEntity.getDueTime();
-        this.comment = taskEntity.getComment();
+        this.comments = taskEntity.getComments();
         this.reporter = taskEntity.getReporter().getName();
         this.assignee = taskEntity.getAssignee().getName();
     }

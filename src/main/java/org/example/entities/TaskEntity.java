@@ -37,8 +37,8 @@ public class TaskEntity {
     @Column(name = "due_time")
     private LocalDateTime dueTime;
 
-    @Column(name = "comment")
-    private String comment;
+    @Column(name = "comments")
+    private List<String> comments = new ArrayList<>();
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

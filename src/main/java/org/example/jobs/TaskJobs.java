@@ -26,8 +26,10 @@ public class TaskJobs {
         for (TaskEntity task : dueTasks) {
             long duration = Duration.between(LocalDateTime.now(), task.getDueTime()).toDays();
             if (duration <= (Duration.between(task.getCreationTime(),
-                    task.getDueTime()).toDays() * 0.1) || duration <= 7)
-                log.info("[{}] {} Days to deadline for task with id {}", uuid, duration, task.getId());
+                    task.getDueTime()).toDays() * 0.1) || duration <= 7) {
+                task.getComments().add(duration + "Days till deadline");
+                taskRepository.save(task);
+            }
         }
     }
 

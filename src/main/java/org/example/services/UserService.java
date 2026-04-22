@@ -13,7 +13,6 @@ import org.example.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
-    public void createUser(CreateUserRequest createUserRequest) {
-        String uuid = UUID.randomUUID().toString();
+    public void createUser(CreateUserRequest createUserRequest, String uuid) {
         log.info("[{}] Creating user: {}", uuid, createUserRequest);
         final UserEntity userEntity = new UserEntity();
         userEntity.setName(createUserRequest.getName());
@@ -34,8 +32,7 @@ public class UserService {
         log.info("[{}] Created user with id {}", uuid, userEntity.getId());
     }
 
-    public void assignToProject(long projectId, long userId) {
-        String uuid = UUID.randomUUID().toString();
+    public void assignToProject(long projectId, long userId, String uuid) {
         log.info("[{}] Assigning to project",  uuid);
         final ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
@@ -48,8 +45,7 @@ public class UserService {
         log.info("[{}] Assigned user with id {}", uuid, user.getId());
     }
 
-    public void modifyUser(long userId, ModifyUserRequest modifyUserRequest) {
-        String uuid = UUID.randomUUID().toString();
+    public void modifyUser(long userId, ModifyUserRequest modifyUserRequest, String uuid) {
         log.info("[{}] Modifying user: {}", uuid, modifyUserRequest);
         UserEntity entity = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
@@ -59,8 +55,7 @@ public class UserService {
         log.info("[{}] Modified user with id {}", uuid, userId);
     }
 
-    public UserResponse getUserById(long id) {
-        String uuid = UUID.randomUUID().toString();
+    public UserResponse getUserById(long id, String uuid) {
         final UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("[{0}] User with id {1} not found", uuid, id)));
@@ -69,8 +64,7 @@ public class UserService {
         return userResponse;
     }
 
-    public void deleteUserById(long id) {
-        String uuid = UUID.randomUUID().toString();
+    public void deleteUserById(long id, String uuid) {
         log.info("[{}] Deleting user with id {}", uuid, id);
         final UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
