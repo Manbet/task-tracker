@@ -12,6 +12,7 @@ import org.example.entities.UserEntity;
 import org.example.enums.TaskStatus;
 import org.example.exceptions.ForbiddenException;
 import org.example.exceptions.NoSuchEntityException;
+import org.example.jobs.TaskJobs;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.TaskRepository;
 import org.example.repositories.UserRepository;

@@ -27,7 +27,7 @@ public class TaskJobs {
             long duration = Duration.between(LocalDateTime.now(), task.getDueTime()).toDays();
             if (duration <= (Duration.between(task.getCreationTime(),
                     task.getDueTime()).toDays() * 0.1) || duration <= 7) {
-                task.getComments().add(duration + "Days till deadline");
+                task.getComments().add(duration + " Days till deadline");
                 taskRepository.save(task);
             }
         }
@@ -37,11 +37,7 @@ public class TaskJobs {
     public void flushExpiredTasks() {
         String uuid = UUID.randomUUID().toString();
         log.info("[{}] Trying to flush expired tasks", uuid);
-        List<TaskEntity> oldTasks = taskRepository.findExpiredTasks();
-        for (TaskEntity oldTask : oldTasks) {
-            taskRepository.deleteById(oldTask.getId());
-            log.info("[{}] Deleted expired task {}", uuid, oldTask.getId());
-        }
-        log.info("[{}] Successfully deleted {} expired tasks", uuid, oldTasks.size());
+        int size = taskRepository.findExpiredTasks();
+        log.info("[{}] Successfully deleted {} expired tasks", uuid, size);
     }
 }
