@@ -20,7 +20,7 @@ public class RequestLoggingFilter implements Filter {
         try {
             chain.doFilter(request, response);
         } finally {
-            MDC.remove("uuid");
+            MDC.clear();
         }
     }
 }

@@ -18,7 +18,7 @@ import java.util.List;
 public class TaskJobs {
     private final TaskRepository taskRepository;
 
-    @Scheduled(cron = "${spring.session.jdbc.deadlines-cron}")
+    @Scheduled(cron = "${app.jobs.notify-deadlines.cron}")
     public void notifyDeadlines() {
         log.info("Notifying deadlines");
         taskRepository.findDeadlines();
@@ -32,7 +32,7 @@ public class TaskJobs {
         }
     }
 
-    @Scheduled(cron = "${spring.session.jdbc.cleanup-cron}")
+    @Scheduled(cron = "${app.jobs.flush-expired-tasks.cron}")
     public void flushExpiredTasks() {
         log.info("Trying to flush expired tasks");
         int size = taskRepository.findExpiredTasks();

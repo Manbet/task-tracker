@@ -16,7 +16,9 @@ spring:
       properties:
         hibernate:
           format_sql: true
-  session:
-    jdbc:
-      cleanup-cron: "0 0 0 * * *"
-      deadlines-cron: "0 0 0 * * *"
+app:
+  jobs:
+    notify-deadlines:
+      cron: "0 0 0 * * *"
+    flush-expired-tasks:
+      cron: "0 0 0 * * *"

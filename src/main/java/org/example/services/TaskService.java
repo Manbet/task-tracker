@@ -33,6 +33,10 @@ public class TaskService {
     private final ProjectRepository projectRepository;
     private final CommentRepository commentRepository;
 
+    /*
+    Если проект открытый, то любой может создать задачу
+    Если проект закрытый, то создать задачу может только пользователь
+     */
     public void createTask(CreateTaskRequest createTaskRequest) {
         log.info("Creating task");
         final TaskEntity newTask = new TaskEntity();
@@ -52,6 +56,10 @@ public class TaskService {
         MDC.clear();
     }
 
+    /*
+    Если проект открытый, то любой может редактировать задачу
+    Если проект закрытый, то редактировать задачу может только пользователь
+     */
     public void modifyTask(long taskId, long userId, ModifyTaskRequest request) {
         log.info("Modifying task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -78,6 +86,10 @@ public class TaskService {
         MDC.clear();
     }
 
+    /*
+    Если оба проекты открытие, то любой может переназначить проект для задачи
+    Если один из проектов закрытый (или оба), то пользователь должен быть в списке пользователей проекта (или обоих)
+    */
     public void assignToProject(long taskId, long userId, long projectId) {
         log.info("Assigning to project with id {}", projectId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -100,6 +112,10 @@ public class TaskService {
         MDC.clear();
     }
 
+    /*
+    Если проект открытый, то любой может редактировать задачу
+    Если проект закрытый, то редактировать задачу может только пользователь
+     */
     public void changeStatus(long taskId, long userId, String taskStatus) {
         log.info("Changing status of task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -117,6 +133,10 @@ public class TaskService {
         MDC.clear();
     }
 
+    /*
+    Если проект открытый, то любой может редактировать задачу
+    Если проект закрытый, то редактировать задачу может только пользователь
+     */
     public void changeAssignee(long taskId, long assigneeId) {
         log.info("Changing assignee of task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -137,6 +157,10 @@ public class TaskService {
         MDC.clear();
     }
 
+    /*
+    Если проект открытый, то любой может редактировать задачу
+    Если проект закрытый, то редактировать задачу может только пользователь
+     */
     public void removeAssignee(long taskId, long assigneeId) {
         log.info("Removing assignee with id {} from task with id {}", assigneeId, taskId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -154,6 +178,10 @@ public class TaskService {
         MDC.clear();
     }
 
+    /*
+    Если проект открытый, то любой может редактировать задачу
+    Если проект закрытый, то редактировать задачу может только пользователь
+     */
     public void addWatcher(long taskId, long watcherId) {
         log.info("Adding watcher with id {} to a task with id {}", watcherId, taskId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -175,6 +203,10 @@ public class TaskService {
         MDC.clear();
     }
 
+    /*
+    Если проект открытый, то любой может редактировать задачу
+    Если проект закрытый, то редактировать задачу может только пользователь
+     */
     public void removeWatcher(ChangeWatcherRequest request) {
         log.info("Removing watcher with id {} from task with  id {}", request.getTaskId(), request.getTaskId());
         final TaskEntity task = taskRepository.findById(request.getTaskId())
@@ -196,6 +228,10 @@ public class TaskService {
         MDC.clear();
     }
 
+    /*
+    Если проект открытый, то любой может получить данные задачи
+    Если проект закрытый, то получить данные задачи может только пользователь
+     */
     public TaskResponse findById(long id) {
         final var taskEntity = taskRepository.findById(id)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
@@ -206,6 +242,10 @@ public class TaskService {
         return taskResponse;
     }
 
+    /*
+    Если проект открытый, то любой может получить данные задачи
+    Если проект закрытый, то получить данные задачи может только пользователь
+     */
     public List<TaskResponse> findAll() {
         List<TaskEntity> taskEntities = taskRepository.findAll();
         List<TaskResponse> taskResponses = taskEntities.stream().map(TaskResponse::new).toList();

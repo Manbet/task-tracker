@@ -31,7 +31,6 @@ public class UserService {
         userEntity.setActive(true);
         userRepository.save(userEntity);
         log.info("Created user with id {}", userEntity.getId());
-        MDC.clear();
     }
 
     public void assignToProject(long projectId, long userId) {

@@ -32,6 +32,9 @@ public class ProjectService {
         MDC.clear();
     }
 
+    /*
+    Смотрим только на user'ов и поправить contains
+     */
     public void deleteProject(long projectId, long userId) {
         log.info("Deleting project with id {}", projectId);
         final ProjectEntity project = projectRepository.findById(projectId)
@@ -49,6 +52,9 @@ public class ProjectService {
         MDC.clear();
     }
 
+    /*
+    Смотрим только на user'ов и поправить contains
+     */
     public void modifyProject(long projectId, long userId, ModifyProjectRequest request) {
         log.info("Modifying project with id {}", projectId);
         final ProjectEntity project = projectRepository.findById(projectId)
@@ -65,6 +71,10 @@ public class ProjectService {
         MDC.clear();
     }
 
+    /*
+    Получить информацию по проект могут все, если проект открытый
+    Получить информацию по проект могут только пользователи проекта, если проект закрытый
+     */
     public ProjectResponse getProjectById(long projectId) {
         log.info("Getting project by id{}", projectId);
         final ProjectEntity projectEntity = projectRepository.findById(projectId)
@@ -75,6 +85,10 @@ public class ProjectService {
         return new ProjectResponse(projectEntity);
     }
 
+    /*
+    Получить информацию по проект могут все, если проект открытый
+    Получить информацию по проект могут только пользователи проекта, если проект закрытый
+     */
     public ProjectResponse getProjectByName(String name) {
         log.info("Getting project by name {}", name);
         final ProjectEntity projectEntity = projectRepository.findByName(name);
@@ -87,6 +101,9 @@ public class ProjectService {
         return new ProjectResponse(projectEntity);
     }
 
+    /*
+    ??? Фильтрация по доступности проекта для пользователя
+     */
     public List<ProjectResponse> findAllProjects() {
         log.info("Finding all projects");
         List<ProjectEntity> projects = projectRepository.findAll();
