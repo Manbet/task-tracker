@@ -37,8 +37,8 @@ public class TaskEntity {
     @Column(name = "due_time")
     private LocalDateTime dueTime;
 
-    @Column(name = "comments")
-    private List<String> comments = new ArrayList<>();
+    @OneToMany(mappedBy = "task")
+    private List<CommentEntity> comments = new ArrayList<>();
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

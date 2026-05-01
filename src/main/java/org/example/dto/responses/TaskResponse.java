@@ -1,6 +1,7 @@
 package org.example.dto.responses;
 
 import lombok.Data;
+import org.example.entities.CommentEntity;
 import org.example.entities.TaskEntity;
 
 import java.time.LocalDateTime;
@@ -14,7 +15,7 @@ public class TaskResponse {
     private final LocalDateTime creationTime;
     private final LocalDateTime lastUpdateTime;
     private final LocalDateTime dueTime;
-    private final List<String> comments;
+    private final List<CommentEntity> comments;
     private final String reporter;
     private final String assignee;
 

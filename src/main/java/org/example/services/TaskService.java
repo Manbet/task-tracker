@@ -6,13 +6,14 @@ import org.example.dto.requests.ChangeWatcherRequest;
 import org.example.dto.requests.CreateTaskRequest;
 import org.example.dto.requests.ModifyTaskRequest;
 import org.example.dto.responses.TaskResponse;
+import org.example.entities.CommentEntity;
 import org.example.entities.ProjectEntity;
 import org.example.entities.TaskEntity;
 import org.example.entities.UserEntity;
 import org.example.enums.TaskStatus;
 import org.example.exceptions.ForbiddenException;
 import org.example.exceptions.NoSuchEntityException;
-import org.example.jobs.TaskJobs;
+import org.example.repositories.CommentRepository;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.TaskRepository;
 import org.example.repositories.UserRepository;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +31,9 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+    private final CommentRepository commentRepository;
 
-    public void createTask(CreateTaskRequest createTaskRequest, String uuid) {
-        MDC.put("uuid", uuid);
+    public void createTask(CreateTaskRequest createTaskRequest) {
         log.info("Creating task");
         final TaskEntity newTask = new TaskEntity();
         final UserEntity reporter = userRepository.findById(createTaskRequest.getReporter())
@@ -47,85 +47,98 @@ public class TaskService {
         newTask.setReporter(reporter);
         newTask.getWatchers().add(reporter);
         newTask.setStatus(TaskStatus.IDLE);
-        ProjectEntity project = projectRepository.findById(createTaskRequest.getProjectId())
-                .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("Project with id {0} not found", createTaskRequest.getProjectId())));
-        project.getUsers().add(reporter);
-        newTask.setProject(project);
         taskRepository.save(newTask);
-        MDC.put("taskId", String.valueOf(newTask.getId()));
-        log.info("Created task");
+        log.info("Created task with id {}", newTask.getId());
         MDC.clear();
     }
 
-    public void modifyTask(long taskId, long userId, ModifyTaskRequest modifyTaskRequest, String uuid) {
-        MDC.put("uuid", uuid);
-        MDC.put("taskId", String.valueOf(taskId));
-        log.info("Modifying task");
+    public void modifyTask(long taskId, long userId, ModifyTaskRequest request) {
+        log.info("Modifying task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("No task with id {0}", taskId)));
+                        .format("Task with id {0} not found", taskId)));
         if (task.getProject().getUsers().stream().anyMatch(x -> x.getId() == userId)) {
-            task.getComments().add(modifyTaskRequest.getComment());
-            task.setDescription(modifyTaskRequest.getDescription());
+            CommentEntity comment = commentRepository.findCommentByText(request.getComment());
+            if (comment == null) {
+                UserEntity user = userRepository.findById(userId)
+                        .orElseThrow(() -> new NoSuchEntityException(MessageFormat
+                                .format("User with id {0} not found", userId)));
+                comment = new CommentEntity(user, request.getComment(),
+                        task, LocalDateTime.now(), LocalDateTime.now());
+            }
+            task.getComments().add(comment);
+            task.setDescription(request.getDescription());
             taskRepository.save(task);
             log.info("Modified task");
         } else {
-            MDC.put("userId", String.valueOf(userId));
-            log.info("User tried to modify task");
+            log.info("User with id {} tried to modify task", userId);
             throw new ForbiddenException(MessageFormat
                     .format("User with id {0} does not belong to this project", userId));
         }
         MDC.clear();
     }
 
-    public void changeStatus(long taskId, long userId, String taskStatus, String uuid) {
-        MDC.put("uuid", uuid);
-        MDC.put("taskId", String.valueOf(taskId));
-        log.info("Changing status of task");
+    public void assignToProject(long taskId, long userId, long projectId) {
+        log.info("Assigning to project with id {}", projectId);
+        final TaskEntity task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NoSuchEntityException(MessageFormat
+                        .format("Task with id {0} not found", taskId)));
+        if (task.getProject().getUsers().stream().anyMatch(x -> x.getId() == userId)) {
+            final ProjectEntity project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new NoSuchEntityException(MessageFormat
+                            .format("Project with id {0} not found", projectId)));
+            task.setProject(project);
+            project.getTasks().add(task);
+            taskRepository.save(task);
+            projectRepository.save(project);
+            log.info("Assigned task with id {} to a project with id {}", task.getId(), project.getId());
+        } else {
+            log.info("User with id {} tried to assign task", userId);
+            throw new ForbiddenException(MessageFormat
+                    .format("User with id {0} does not belong to this task", userId));
+        }
+        MDC.clear();
+    }
+
+    public void changeStatus(long taskId, long userId, String taskStatus) {
+        log.info("Changing status of task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("No task with id {0}", taskId)));
-        MDC.put("userId", String.valueOf(userId));
         if (task.getProject().getUsers().stream().anyMatch(x -> x.getId() == userId)) {
-            task.setStatus(TaskStatus.getEnumByLowercaseName(taskStatus, uuid));
+            task.setStatus(TaskStatus.getEnumByLowercaseName(taskStatus));
             taskRepository.save(task);
-            log.info("Changed status of task");
+            log.info("Changed status of task with id {}", taskId);
         } else {
-            log.info("User tried to change status of task");
+            log.info("User with id {} tried to change status of task", userId);
             throw new ForbiddenException(MessageFormat
                     .format("User with id {0} does not belong to this project", userId));
         }
         MDC.clear();
     }
 
-    public void changeAssignee(long taskId, long assigneeId, String uuid) {
-        MDC.put("uuid", uuid);
-        MDC.put("taskId", String.valueOf(taskId));
-        log.info("Changing assignee of task");
+    public void changeAssignee(long taskId, long assigneeId) {
+        log.info("Changing assignee of task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("No task with id {0}", taskId)));
         final UserEntity assignee = userRepository.findById(assigneeId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("User with id {0} not found", assigneeId)));
-        MDC.put("userId", String.valueOf(assigneeId));
         if (task.getProject().getUsers().stream().anyMatch(x -> x.getId() == assigneeId)) {
             task.setAssignee(assignee);
             taskRepository.save(task);
-            log.info("Assigned as an assignee to a task");
+            log.info("Assigned user with id {} as an assignee to a task with id {}", assigneeId, taskId);
         } else {
-            log.info("User tried to change assignee of task");
+            log.info("User with id {} tried to change assignee of task", assigneeId);
             throw new ForbiddenException(MessageFormat
-                    .format("User with id {0} not found", assigneeId));
+                    .format("User with id {0} is forbidden", assigneeId));
         }
         MDC.clear();
     }
 
-    public void removeAssignee(long taskId, long assigneeId, String uuid) {
-        MDC.put("uuid", uuid);
-        MDC.put("taskId", String.valueOf(taskId));
-        log.info("Removing assignee of task");
+    public void removeAssignee(long taskId, long assigneeId) {
+        log.info("Removing assignee with id {} from task with id {}", assigneeId, taskId);
         final TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("No task with id {0}", taskId)));
@@ -134,18 +147,15 @@ public class TaskService {
             taskRepository.save(task);
             log.info("Removed assignee from a task");
         } else {
-            MDC.put("userId", String.valueOf(assigneeId));
-            log.info("User tried to remove assignee from task");
+            log.info("User with id {} tried to remove assignee from task", assigneeId);
             throw new ForbiddenException(MessageFormat
-                    .format("User with id {0} not found", assigneeId));
+                    .format("User with id {0} is forbidden", assigneeId));
         }
         MDC.clear();
     }
 
-    public void addWatcher(long taskId, long watcherId, String uuid) {
-        MDC.put("uuid", uuid);
-        MDC.put("taskId", String.valueOf(taskId));
-        log.info("Adding watcher of task");
+    public void addWatcher(long taskId, long watcherId) {
+        log.info("Adding watcher with id {} to a task with id {}", watcherId, taskId);
         final TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("No task with id {0}", taskId)));
@@ -160,15 +170,13 @@ public class TaskService {
         } else {
             log.info("User tried to add watcher to a task");
             throw new ForbiddenException(MessageFormat
-                    .format("User with id {0} not found", watcherId));
+                    .format("User with id {0} is forbidden", watcherId));
         }
         MDC.clear();
     }
 
-    public void removeWatcher(ChangeWatcherRequest request, String uuid) {
-        MDC.put("uuid", uuid);
-        MDC.put("taskId", String.valueOf(request.getTaskId()));
-        log.info("Removing watcher from task");
+    public void removeWatcher(ChangeWatcherRequest request) {
+        log.info("Removing watcher with id {} from task with  id {}", request.getTaskId(), request.getTaskId());
         final TaskEntity task = taskRepository.findById(request.getTaskId())
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("No task with id {0}", request.getTaskId())));
@@ -179,31 +187,28 @@ public class TaskService {
         if (task.getProject().getUsers().stream().anyMatch(x -> x.getId() == watcher.getId())) {
             task.getWatchers().remove(watcher);
             taskRepository.save(task);
-            log.info("Removed user as a watcher from a task");
+            log.info("Removed watcher with id {} from a task with id {}", watcher.getId(), task.getId());
         } else {
-            log.info("User tried to remove watcher from task");
+            log.info("User with id {} tried to remove watcher from task with id {}", watcher.getId(), task.getId());
             throw new ForbiddenException(MessageFormat
-                    .format("User with id {0} not found", watcher.getId()));
+                    .format("User with id {0} is forbidden", watcher.getId()));
         }
         MDC.clear();
     }
 
-    public TaskResponse findById(long id, String uuid) {
+    public TaskResponse findById(long id) {
         final var taskEntity = taskRepository.findById(id)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("No task with id {0}", id)));
         TaskResponse taskResponse = new TaskResponse(taskEntity);
-        MDC.put("uuid", uuid);
-        MDC.put("taskId", String.valueOf(id));
-        log.info("Found task");
+        log.info("Found task with id {}", taskEntity.getId());
         MDC.clear();
         return taskResponse;
     }
 
-    public List<TaskResponse> findAll(String uuid) {
+    public List<TaskResponse> findAll() {
         List<TaskEntity> taskEntities = taskRepository.findAll();
         List<TaskResponse> taskResponses = taskEntities.stream().map(TaskResponse::new).toList();
-        MDC.put("uuid", uuid);
         log.info("Found {} tasks", taskEntities.size());
         MDC.clear();
         return taskResponses;

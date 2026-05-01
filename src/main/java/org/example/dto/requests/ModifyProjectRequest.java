@@ -1,14 +1,11 @@
 package org.example.dto.requests;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class CreateProjectRequest {
+public class ModifyProjectRequest {
     @NotBlank
     private final String name;
     private final String description;
-    @NotNull
-    private final boolean isOpened;
 }

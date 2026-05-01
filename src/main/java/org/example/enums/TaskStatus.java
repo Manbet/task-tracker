@@ -22,10 +22,9 @@ public enum TaskStatus {
         return status;
     }
 
-    public static TaskStatus getEnumByLowercaseName(String status, String uuid) {
+    public static TaskStatus getEnumByLowercaseName(String status) {
         return Arrays.stream(TaskStatus.values()).filter(x -> x
                 .getStatus().equals(status)).findFirst()
-                .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                .format("[{0}] No such task status", uuid)));
+                .orElseThrow(() -> new NoSuchEntityException("No such task status"));
     }
 }

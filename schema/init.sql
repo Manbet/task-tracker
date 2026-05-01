@@ -3,7 +3,7 @@ create table if not exists tasks
     id               bigserial primary key,
     title            varchar(255)                not null,
     description      text,
-    comments         text[],
+    comments         bigint[],
     status           text,
     creation_time    timestamp without time zone not null,
     last_update_time timestamp without time zone not null,
@@ -28,7 +28,18 @@ create table if not exists projects
     id          bigserial primary key,
     name        varchar(255) not null,
     is_active   boolean      not null,
+    is_open     boolean      not null,
     description text
+);
+
+create table if not exists comments
+(
+    id               bigserial primary key,
+    text             text                        not null,
+    creation_time    timestamp without time zone not null,
+    last_update_time timestamp without time zone not null,
+    author           bigint,
+    task             bigint                      not null
 );
 
 create table if not exists task_watchers

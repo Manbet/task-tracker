@@ -1,3 +1,4 @@
+---
 server:
   port: 8081
 spring:
@@ -15,3 +16,7 @@ spring:
       properties:
         hibernate:
           format_sql: true
+  session:
+    jdbc:
+      cleanup-cron: "0 0 0 * * *"
+      deadlines-cron: "0 0 0 * * *"

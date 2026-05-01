@@ -10,6 +10,7 @@ import org.example.entities.UserEntity;
 import org.example.exceptions.NoSuchEntityException;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.UserRepository;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -21,57 +22,62 @@ public class UserService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
-    public void createUser(CreateUserRequest createUserRequest, String uuid) {
-        log.info("[{}] Creating user: {}", uuid, createUserRequest);
+    public void createUser(CreateUserRequest createUserRequest) {
+        log.info("Creating user: {}", createUserRequest);
         final UserEntity userEntity = new UserEntity();
         userEntity.setName(createUserRequest.getName());
         userEntity.setSurname(createUserRequest.getSurname());
         userEntity.setGender(createUserRequest.getGender());
         userEntity.setActive(true);
         userRepository.save(userEntity);
-        log.info("[{}] Created user with id {}", uuid, userEntity.getId());
+        log.info("Created user with id {}", userEntity.getId());
+        MDC.clear();
     }
 
-    public void assignToProject(long projectId, long userId, String uuid) {
-        log.info("[{}] Assigning to project",  uuid);
+    public void assignToProject(long projectId, long userId) {
+        log.info("Assigning user with id {} to project with id {}",  userId, projectId);
         final ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("[{0}] Project with id {1} not found", uuid, projectId)));
+                        .format("Project with id {0} not found", projectId)));
         final UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("[{0}] User with id {1} not found", uuid, userId)));
+                        .format("User with id {0} not found", userId)));
         user.getProjects().add(project);
         userRepository.save(user);
-        log.info("[{}] Assigned user with id {}", uuid, user.getId());
+        log.info("Assigned user with id {}", user.getId());
+        MDC.clear();
     }
 
-    public void modifyUser(long userId, ModifyUserRequest modifyUserRequest, String uuid) {
-        log.info("[{}] Modifying user: {}", uuid, modifyUserRequest);
+    public void modifyUser(long userId, ModifyUserRequest modifyUserRequest) {
+        log.info("Modifying user: {}", modifyUserRequest);
         UserEntity entity = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("[{0}] User with id {1} not found", uuid, userId)));
+                        .format("User with id {0} not found", userId)));
         entity.setBirthDate(modifyUserRequest.getBirthday());
         userRepository.save(entity);
-        log.info("[{}] Modified user with id {}", uuid, userId);
+        log.info("Modified user with id {}", userId);
+        MDC.clear();
     }
 
-    public UserResponse getUserById(long id, String uuid) {
+    public UserResponse getUserById(long id) {
         final UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("[{0}] User with id {1} not found", uuid, id)));
+                        .format("User with id {0} not found", id)));
         UserResponse userResponse = new UserResponse(userEntity);
-        log.info("[{}] User with id {} found", uuid, userEntity.getId());
+        log.info("User with id {} found", userEntity.getId());
+        MDC.clear();
         return userResponse;
     }
 
-    public void deleteUserById(long id, String uuid) {
-        log.info("[{}] Deleting user with id {}", uuid, id);
+    public void deleteUserById(long id) {
+        log.info("Deleting user with id {}", id);
         final UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("[{0}] User with id {1} not found", uuid, id)));
+                        .format("User with id {0} not found", id)));
         userEntity.setActive(false);
-        log.info("[{}] User active status was changed to false",  uuid);
+        log.info("User active status was changed to false");
         userRepository.save(userEntity);
-        log.info("[{}] User with id {} deleted", uuid, id);
+        log.info("User with id {} deleted", id);
+        MDC.clear();
     }
 }
