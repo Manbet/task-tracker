@@ -34,19 +34,21 @@ public class ProjectController {
         projectService.modifyProject(projectId, userId, modifyProjectRequest);
     }
 
-    @GetMapping("/project/{id}")
-    public ProjectResponse getProjectById(@Valid @PathVariable Long id) {
-        return projectService.getProjectById(id);
+    @GetMapping("/project/{projectId}")
+    public ProjectResponse getProjectById(@Valid @PathVariable Long projectId,
+                                          @Valid @RequestParam Long userId) {
+        return projectService.getProjectById(projectId, userId);
     }
 
     @GetMapping("/project")
-    public ProjectResponse getProjectByName(@Valid @RequestParam String name) {
-        return projectService.getProjectByName(name);
+    public ProjectResponse getProjectByName(@Valid @RequestParam String name,
+                                            @Valid @RequestParam Long userId) {
+        return projectService.getProjectByName(name, userId);
     }
 
 
     @GetMapping("/projects")
-    public List<ProjectResponse> getAllProjects() {
-        return projectService.findAllProjects();
+    public List<ProjectResponse> getAllProjects(@Valid @RequestParam Long userId) {
+        return projectService.findAllProjects(userId);
     }
 }

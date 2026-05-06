@@ -290,6 +290,84 @@
       }
     },
     "/tasks/{taskId}": {
+      "get": {
+        "tags": [
+          "task-controller"
+        ],
+        "operationId": "getTask",
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "task-controller"
@@ -818,6 +896,84 @@
       }
     },
     "/project/{projectId}": {
+      "get": {
+        "tags": [
+          "project-controller"
+        ],
+        "operationId": "getProjectById",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "project-controller"
@@ -924,6 +1080,112 @@
             }
           }
         ],
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/jobs/flush": {
+      "put": {
+        "tags": [
+          "job-controller"
+        ],
+        "operationId": "flushJobs",
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/jobs/deadlines": {
+      "put": {
+        "tags": [
+          "job-controller"
+        ],
+        "operationId": "deadlinesJobs",
         "responses": {
           "500": {
             "description": "Internal Server Error",
@@ -1111,6 +1373,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "responses": {
@@ -1228,16 +1499,16 @@
         }
       }
     },
-    "/tasks/{id}": {
+    "/projects": {
       "get": {
         "tags": [
-          "task-controller"
+          "project-controller"
         ],
-        "operationId": "getTask",
+        "operationId": "getAllProjects",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
+            "name": "userId",
+            "in": "query",
             "required": true,
             "schema": {
               "type": "integer",
@@ -1245,66 +1516,6 @@
             }
           }
         ],
-        "responses": {
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/projects": {
-      "get": {
-        "tags": [
-          "project-controller"
-        ],
-        "operationId": "getAllProjects",
         "responses": {
           "500": {
             "description": "Internal Server Error",
@@ -1362,16 +1573,16 @@
         }
       }
     },
-    "/project/{id}": {
+    "/all-tasks": {
       "get": {
         "tags": [
-          "project-controller"
+          "task-controller"
         ],
-        "operationId": "getProjectById",
+        "operationId": "getAllTasks",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
+            "name": "userId",
+            "in": "query",
             "required": true,
             "schema": {
               "type": "integer",
@@ -1379,66 +1590,6 @@
             }
           }
         ],
-        "responses": {
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProjectResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/all-tasks": {
-      "get": {
-        "tags": [
-          "task-controller"
-        ],
-        "operationId": "getAllTasks",
         "responses": {
           "500": {
             "description": "Internal Server Error",
@@ -1514,7 +1665,11 @@
       "ModifyTaskRequest": {
         "type": "object",
         "properties": {
-          "comment": {
+          "commentId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "commentText": {
             "type": "string",
             "minLength": 1
           },
@@ -1524,7 +1679,8 @@
           }
         },
         "required": [
-          "comment",
+          "commentId",
+          "commentText",
           "description"
         ]
       },
@@ -1571,7 +1727,8 @@
             "type": "string",
             "enum": [
               "MALE",
-              "FEMALE"
+              "FEMALE",
+              "SYSTEM"
             ]
           }
         },
@@ -1627,6 +1784,32 @@
         "required": [
           "name"
         ]
+      },
+      "CommentEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "text": {
+            "type": "string"
+          },
+          "creationTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastUpdateTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserEntity"
+          },
+          "task": {
+            "$ref": "#/components/schemas/TaskEntity"
+          }
+        }
       },
       "ProjectEntity": {
         "type": "object",
@@ -1690,7 +1873,7 @@
           "comments": {
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/CommentEntity"
             }
           },
           "status": {
@@ -1723,6 +1906,45 @@
           "title"
         ]
       },
+      "TaskResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "creationTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastUpdateTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dueTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommentEntity"
+            }
+          },
+          "reporter": {
+            "type": "string"
+          },
+          "assignee": {
+            "type": "string"
+          }
+        }
+      },
       "UserEntity": {
         "type": "object",
         "properties": {
@@ -1744,7 +1966,8 @@
             "type": "string",
             "enum": [
               "MALE",
-              "FEMALE"
+              "FEMALE",
+              "SYSTEM"
             ]
           },
           "reportedTasks": {
@@ -1789,59 +2012,20 @@
           "reportedTasks": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TaskEntity"
+              "$ref": "#/components/schemas/TaskResponse"
             }
           },
           "assignedTasks": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TaskEntity"
+              "$ref": "#/components/schemas/TaskResponse"
             }
           },
           "waitingTasks": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TaskEntity"
+              "$ref": "#/components/schemas/TaskResponse"
             }
-          }
-        }
-      },
-      "TaskResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "title": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "creationTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "lastUpdateTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dueTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "comments": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "reporter": {
-            "type": "string"
-          },
-          "assignee": {
-            "type": "string"
           }
         }
       },

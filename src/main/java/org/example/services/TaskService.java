@@ -17,7 +17,6 @@ import org.example.repositories.CommentRepository;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.TaskRepository;
 import org.example.repositories.UserRepository;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -33,110 +32,108 @@ public class TaskService {
     private final ProjectRepository projectRepository;
     private final CommentRepository commentRepository;
 
-    /*
-    Если проект открытый, то любой может создать задачу
-    Если проект закрытый, то создать задачу может только пользователь
-     */
-    public void createTask(CreateTaskRequest createTaskRequest) {
+    public void createTask(CreateTaskRequest request) {
         log.info("Creating task");
-        final TaskEntity newTask = new TaskEntity();
-        final UserEntity reporter = userRepository.findById(createTaskRequest.getReporter())
+        ProjectEntity project = projectRepository.findById(request.getProjectId())
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("User with id {0} not found", createTaskRequest.getReporter())));
-        newTask.setTitle(createTaskRequest.getTitle());
-        newTask.setDescription(createTaskRequest.getDescription());
-        newTask.setDueTime(createTaskRequest.getDueDate());
-        newTask.setCreationTime(LocalDateTime.now());
-        newTask.setLastUpdateTime(LocalDateTime.now());
-        newTask.setReporter(reporter);
-        newTask.getWatchers().add(reporter);
-        newTask.setStatus(TaskStatus.IDLE);
-        taskRepository.save(newTask);
-        log.info("Created task with id {}", newTask.getId());
-        MDC.clear();
+                        .format("Project with id {0} does not exist", request.getProjectId())));
+        final UserEntity reporter = userRepository.findById(request.getReporter())
+                .orElseThrow(() -> new NoSuchEntityException(MessageFormat
+                        .format("User with id {0} not found", request.getReporter())));
+        if (project.isOpen() || project.getUsers().contains(reporter)) {
+            final TaskEntity newTask = new TaskEntity();
+            newTask.setTitle(request.getTitle());
+            newTask.setDescription(request.getDescription());
+            newTask.setDueTime(request.getDueDate());
+            newTask.setCreationTime(LocalDateTime.now());
+            newTask.setLastUpdateTime(LocalDateTime.now());
+            newTask.setReporter(reporter);
+            newTask.getWatchers().add(reporter);
+            newTask.setStatus(TaskStatus.IDLE);
+            taskRepository.save(newTask);
+            log.info("Created task with id {}", newTask.getId());
+        } else {
+            log.warn("User with id {} tried to create task", request.getReporter());
+            throw new ForbiddenException(MessageFormat
+                    .format("User with id {0} is forbidden", request.getReporter()));
+        }
     }
 
-    /*
-    Если проект открытый, то любой может редактировать задачу
-    Если проект закрытый, то редактировать задачу может только пользователь
-     */
     public void modifyTask(long taskId, long userId, ModifyTaskRequest request) {
         log.info("Modifying task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("Task with id {0} not found", taskId)));
-        if (task.getProject().getUsers().stream().anyMatch(x -> x.getId() == userId)) {
-            CommentEntity comment = commentRepository.findCommentByText(request.getComment());
-            if (comment == null) {
-                UserEntity user = userRepository.findById(userId)
-                        .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                                .format("User with id {0} not found", userId)));
-                comment = new CommentEntity(user, request.getComment(),
-                        task, LocalDateTime.now(), LocalDateTime.now());
-            }
+        if (task.getProject().isOpen() || task.getProject().getUsers()
+                .stream().anyMatch(x -> x.getId() == userId)) {
+            UserEntity user = userRepository.findById(userId)
+                    .orElseThrow(() -> new NoSuchEntityException(MessageFormat
+                            .format("User with id {0} not found", userId)));
+            CommentEntity comment = commentRepository.findById(request.getCommentId())
+                    .orElse(new CommentEntity(user, request.getCommentText(),
+                    task, LocalDateTime.now(), LocalDateTime.now()));
+            // Повторение?
+            comment.setText(request.getCommentText());
             task.getComments().add(comment);
             task.setDescription(request.getDescription());
             taskRepository.save(task);
             log.info("Modified task");
         } else {
-            log.info("User with id {} tried to modify task", userId);
+            log.warn("User with id {} tried to modify task", userId);
             throw new ForbiddenException(MessageFormat
                     .format("User with id {0} does not belong to this project", userId));
         }
-        MDC.clear();
     }
 
-    /*
-    Если оба проекты открытие, то любой может переназначить проект для задачи
-    Если один из проектов закрытый (или оба), то пользователь должен быть в списке пользователей проекта (или обоих)
-    */
     public void assignToProject(long taskId, long userId, long projectId) {
         log.info("Assigning to project with id {}", projectId);
         final TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("Task with id {0} not found", taskId)));
-        if (task.getProject().getUsers().stream().anyMatch(x -> x.getId() == userId)) {
+        if (task.getProject().isOpen() || task.getProject().getUsers()
+                .stream().anyMatch(x -> x.getId() == userId)) {
             final ProjectEntity project = projectRepository.findById(projectId)
                     .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                             .format("Project with id {0} not found", projectId)));
-            task.setProject(project);
-            project.getTasks().add(task);
-            taskRepository.save(task);
-            projectRepository.save(project);
-            log.info("Assigned task with id {} to a project with id {}", task.getId(), project.getId());
+            final UserEntity user = userRepository.findById(userId)
+                    .orElseThrow(() -> new NoSuchEntityException(MessageFormat
+                            .format("User with id {0} not found", userId)));
+            if (project.isOpen() || project.getUsers().contains(user)) {
+                task.setProject(project);
+                project.getTasks().add(task);
+                taskRepository.save(task);
+                projectRepository.save(project);
+                log.info("Assigned task with id {} to a project with id {}", task.getId(), project.getId());
+            } else {
+                // Повторение?
+                log.warn("User with id {} tried to reassign task", userId);
+                throw new ForbiddenException(MessageFormat
+                        .format("User with id {0} does not belong to this task", userId));
+            }
         } else {
-            log.info("User with id {} tried to assign task", userId);
+            log.warn("User with id {} tried to assign task", userId);
             throw new ForbiddenException(MessageFormat
                     .format("User with id {0} does not belong to this task", userId));
         }
-        MDC.clear();
     }
 
-    /*
-    Если проект открытый, то любой может редактировать задачу
-    Если проект закрытый, то редактировать задачу может только пользователь
-     */
     public void changeStatus(long taskId, long userId, String taskStatus) {
         log.info("Changing status of task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("No task with id {0}", taskId)));
-        if (task.getProject().getUsers().stream().anyMatch(x -> x.getId() == userId)) {
+        if (task.getProject().isOpen() || task.getProject().getUsers()
+                .stream().anyMatch(x -> x.getId() == userId)) {
             task.setStatus(TaskStatus.getEnumByLowercaseName(taskStatus));
             taskRepository.save(task);
             log.info("Changed status of task with id {}", taskId);
         } else {
-            log.info("User with id {} tried to change status of task", userId);
+            log.warn("User with id {} tried to change status of task", userId);
             throw new ForbiddenException(MessageFormat
                     .format("User with id {0} does not belong to this project", userId));
         }
-        MDC.clear();
     }
 
-    /*
-    Если проект открытый, то любой может редактировать задачу
-    Если проект закрытый, то редактировать задачу может только пользователь
-     */
     public void changeAssignee(long taskId, long assigneeId) {
         log.info("Changing assignee of task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -145,28 +142,25 @@ public class TaskService {
         final UserEntity assignee = userRepository.findById(assigneeId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("User with id {0} not found", assigneeId)));
-        if (task.getProject().getUsers().stream().anyMatch(x -> x.getId() == assigneeId)) {
+        if (task.getProject().isOpen() || task.getProject().getUsers()
+                .stream().anyMatch(x -> x.getId() == assigneeId)) {
             task.setAssignee(assignee);
             taskRepository.save(task);
             log.info("Assigned user with id {} as an assignee to a task with id {}", assigneeId, taskId);
         } else {
-            log.info("User with id {} tried to change assignee of task", assigneeId);
+            log.warn("User with id {} tried to change assignee of task", assigneeId);
             throw new ForbiddenException(MessageFormat
                     .format("User with id {0} is forbidden", assigneeId));
         }
-        MDC.clear();
     }
 
-    /*
-    Если проект открытый, то любой может редактировать задачу
-    Если проект закрытый, то редактировать задачу может только пользователь
-     */
     public void removeAssignee(long taskId, long assigneeId) {
         log.info("Removing assignee with id {} from task with id {}", assigneeId, taskId);
         final TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("No task with id {0}", taskId)));
-        if (task.getProject().getUsers().stream().anyMatch(x -> x.getId() == assigneeId)) {
+        if (task.getProject().isOpen() || task.getProject().getUsers()
+                .stream().anyMatch(x -> x.getId() == assigneeId)) {
             task.setAssignee(null);
             taskRepository.save(task);
             log.info("Removed assignee from a task");
@@ -175,13 +169,8 @@ public class TaskService {
             throw new ForbiddenException(MessageFormat
                     .format("User with id {0} is forbidden", assigneeId));
         }
-        MDC.clear();
     }
 
-    /*
-    Если проект открытый, то любой может редактировать задачу
-    Если проект закрытый, то редактировать задачу может только пользователь
-     */
     public void addWatcher(long taskId, long watcherId) {
         log.info("Adding watcher with id {} to a task with id {}", watcherId, taskId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -190,23 +179,18 @@ public class TaskService {
         final UserEntity watcher = userRepository.findById(watcherId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("User with id {0} not found", watcherId)));
-        MDC.put("userId", String.valueOf(watcherId));
-        if (task.getProject().getUsers().stream().anyMatch(x -> x.getId() == watcherId)) {
+        if (task.getProject().isOpen() || task.getProject().getUsers().stream()
+                .anyMatch(x -> x.getId() == watcherId)) {
             task.getWatchers().add(watcher);
             taskRepository.save(task);
             log.info("Added user as a watcher to a task");
         } else {
-            log.info("User tried to add watcher to a task");
+            log.warn("User tried to add watcher to a task");
             throw new ForbiddenException(MessageFormat
                     .format("User with id {0} is forbidden", watcherId));
         }
-        MDC.clear();
     }
 
-    /*
-    Если проект открытый, то любой может редактировать задачу
-    Если проект закрытый, то редактировать задачу может только пользователь
-     */
     public void removeWatcher(ChangeWatcherRequest request) {
         log.info("Removing watcher with id {} from task with  id {}", request.getTaskId(), request.getTaskId());
         final TaskEntity task = taskRepository.findById(request.getTaskId())
@@ -215,42 +199,35 @@ public class TaskService {
         final UserEntity watcher = userRepository.findById(request.getWatcherId())
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("User with id {0} not found", request.getWatcherId())));
-        MDC.put("userId", String.valueOf(watcher.getId()));
-        if (task.getProject().getUsers().stream().anyMatch(x -> x.getId() == watcher.getId())) {
+        if (task.getProject().isOpen() || task.getProject().getUsers()
+                .stream().anyMatch(x -> x.getId() == watcher.getId())) {
             task.getWatchers().remove(watcher);
             taskRepository.save(task);
             log.info("Removed watcher with id {} from a task with id {}", watcher.getId(), task.getId());
         } else {
-            log.info("User with id {} tried to remove watcher from task with id {}", watcher.getId(), task.getId());
+            log.warn("User with id {} tried to remove watcher from task with id {}", watcher.getId(), task.getId());
             throw new ForbiddenException(MessageFormat
                     .format("User with id {0} is forbidden", watcher.getId()));
         }
-        MDC.clear();
     }
 
-    /*
-    Если проект открытый, то любой может получить данные задачи
-    Если проект закрытый, то получить данные задачи может только пользователь
-     */
-    public TaskResponse findById(long id) {
-        final var taskEntity = taskRepository.findById(id)
-                .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("No task with id {0}", id)));
-        TaskResponse taskResponse = new TaskResponse(taskEntity);
-        log.info("Found task with id {}", taskEntity.getId());
-        MDC.clear();
-        return taskResponse;
+    public TaskResponse findById(long taskId, long userId) {
+        final TaskEntity task = taskRepository.findOpenById(taskId, userId);
+        if (task != null) {
+            TaskResponse taskResponse = new TaskResponse(task);
+            log.info("Found task with id {}", task.getId());
+            return taskResponse;
+        } else {
+            log.info("Task with id {} not found",  taskId);
+            throw new NoSuchEntityException(MessageFormat
+                    .format("No task with id {0}", taskId));
+        }
     }
 
-    /*
-    Если проект открытый, то любой может получить данные задачи
-    Если проект закрытый, то получить данные задачи может только пользователь
-     */
-    public List<TaskResponse> findAll() {
-        List<TaskEntity> taskEntities = taskRepository.findAll();
+    public List<TaskResponse> findAll(long userId) {
+        List<TaskEntity> taskEntities = taskRepository.findAllOpen(userId);
         List<TaskResponse> taskResponses = taskEntities.stream().map(TaskResponse::new).toList();
         log.info("Found {} tasks", taskEntities.size());
-        MDC.clear();
         return taskResponses;
     }
 }

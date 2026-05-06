@@ -44,7 +44,6 @@ public class UserService {
         user.getProjects().add(project);
         userRepository.save(user);
         log.info("Assigned user with id {}", user.getId());
-        MDC.clear();
     }
 
     public void modifyUser(long userId, ModifyUserRequest modifyUserRequest) {
@@ -55,7 +54,6 @@ public class UserService {
         entity.setBirthDate(modifyUserRequest.getBirthday());
         userRepository.save(entity);
         log.info("Modified user with id {}", userId);
-        MDC.clear();
     }
 
     public UserResponse getUserById(long id) {
@@ -64,7 +62,6 @@ public class UserService {
                         .format("User with id {0} not found", id)));
         UserResponse userResponse = new UserResponse(userEntity);
         log.info("User with id {} found", userEntity.getId());
-        MDC.clear();
         return userResponse;
     }
 
@@ -77,6 +74,5 @@ public class UserService {
         log.info("User active status was changed to false");
         userRepository.save(userEntity);
         log.info("User with id {} deleted", id);
-        MDC.clear();
     }
 }

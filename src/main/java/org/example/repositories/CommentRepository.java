@@ -7,6 +7,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
-    @Query(value = "select * from comments where text = ?1", nativeQuery = true)
-    CommentEntity findCommentByText(String text);
 }

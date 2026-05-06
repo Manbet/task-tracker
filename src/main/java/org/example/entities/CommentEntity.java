@@ -2,6 +2,7 @@ package org.example.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "comments")
+@NoArgsConstructor
 public class CommentEntity {
     @Id
     @Column(name = "id")
@@ -39,16 +41,5 @@ public class CommentEntity {
         this.task = task;
         this.creationTime = creationTime;
         this.lastUpdateTime = lastUpdateTime;
-    }
-
-    public CommentEntity(String text, TaskEntity task, LocalDateTime creationTime, LocalDateTime lastUpdateTime) {
-        this.text = text;
-        this.task = task;
-        this.creationTime = creationTime;
-        this.lastUpdateTime = lastUpdateTime;
-    }
-
-    public CommentEntity() {
-
     }
 }

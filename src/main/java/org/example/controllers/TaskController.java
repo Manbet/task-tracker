@@ -65,13 +65,14 @@ public class TaskController {
         taskService.removeWatcher(changeWatcherRequest);
     }
 
-    @GetMapping("/tasks/{id}")
-    public TaskResponse getTask(@Valid @PathVariable Long id) {
-        return taskService.findById(id);
+    @GetMapping("/tasks/{taskId}")
+    public TaskResponse getTask(@Valid @PathVariable Long taskId,
+                                @Valid @RequestParam Long userId) {
+        return taskService.findById(taskId, userId);
     }
 
     @GetMapping("/all-tasks")
-    public List<TaskResponse> getAllTasks() {
-        return taskService.findAll();
+    public List<TaskResponse> getAllTasks(@Valid @RequestParam Long userId) {
+        return taskService.findAll(userId);
     }
 }

@@ -98,3 +98,6 @@ from tasks t
          join task_watchers tw on t.id = tw.task_id
          join users u on tw.user_id = u.id
 where t.title = 'разбор ошибок';
+
+insert into users (id, name, surname, gender, is_active)
+values (0, 'bot', 'system_user', 'SYSTEM', true)
