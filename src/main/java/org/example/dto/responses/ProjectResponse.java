@@ -7,10 +7,10 @@ import java.util.List;
 
 @Data
 public class ProjectResponse {
-    private long id;
-    private String name;
-    private List<TaskResponse> tasks;
-    private List<UserResponse> users;
+    private final long id;
+    private final String name;
+    private final List<TaskResponse> tasks;
+    private final List<UserResponse> users;
 
     public ProjectResponse(ProjectEntity projectEntity) {
         this.id = projectEntity.getId();

@@ -4,7 +4,6 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.example.exceptions.ForbiddenException;
 import org.example.exceptions.NoSuchEntityException;
-import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,7 +17,6 @@ public class AdviceController {
     @ExceptionHandler(NoSuchEntityException.class)
     public String handleNoSuchEntityException(NoSuchEntityException e) {
         log.error("Handling NoSuchEntityException:", e);
-        MDC.clear();
         return e.getMessage();
     }
 
@@ -29,7 +27,6 @@ public class AdviceController {
     })
     public String handleValidationException(MethodArgumentNotValidException e) {
         log.error("Handling MethodArgumentNotValidException:", e);
-        MDC.clear();
         return e.getMessage();
     }
 
@@ -37,7 +34,6 @@ public class AdviceController {
     @ExceptionHandler(ForbiddenException.class)
     public String handleForbiddenException(ForbiddenException e) {
         log.error("Handling ForbiddenException:", e);
-        MDC.clear();
         return e.getMessage();
     }
 
@@ -45,7 +41,6 @@ public class AdviceController {
     @ExceptionHandler(Exception.class)
     public String handleException(Exception e) {
         log.error("Handling Exceptions:", e);
-        MDC.clear();
         return e.getMessage();
     }
 }

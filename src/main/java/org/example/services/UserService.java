@@ -10,7 +10,6 @@ import org.example.entities.UserEntity;
 import org.example.exceptions.NoSuchEntityException;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.UserRepository;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -23,7 +22,7 @@ public class UserService {
     private final ProjectRepository projectRepository;
 
     public void createUser(CreateUserRequest createUserRequest) {
-        log.info("Creating user: {}", createUserRequest);
+        log.info("Creating user...");
         final UserEntity userEntity = new UserEntity();
         userEntity.setName(createUserRequest.getName());
         userEntity.setSurname(createUserRequest.getSurname());
@@ -33,7 +32,7 @@ public class UserService {
         log.info("Created user with id {}", userEntity.getId());
     }
 
-    public void assignToProject(long projectId, long userId) {
+    public void assignToProject(long userId, long projectId) {
         log.info("Assigning user with id {} to project with id {}",  userId, projectId);
         final ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
@@ -41,8 +40,9 @@ public class UserService {
         final UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("User with id {0} not found", userId)));
+        project.getUsers().add(user);
         user.getProjects().add(project);
-        userRepository.save(user);
+        projectRepository.save(project);
         log.info("Assigned user with id {}", user.getId());
     }
 

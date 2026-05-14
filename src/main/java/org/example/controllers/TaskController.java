@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.requests.ChangeWatcherRequest;
 import org.example.dto.requests.CreateTaskRequest;
-import org.example.dto.requests.ModifyTaskRequest;
 import org.example.dto.responses.TaskResponse;
 import org.example.services.TaskService;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +23,8 @@ public class TaskController {
     @PutMapping("/tasks/{taskId}")
     public void modifyTask(@Valid @PathVariable Long taskId,
                            @Valid @RequestParam Long userId,
-                           @Valid @RequestBody ModifyTaskRequest modifyTaskRequest) {
-        taskService.modifyTask(taskId, userId, modifyTaskRequest);
+                           @Valid @RequestParam String description) {
+        taskService.modifyTask(taskId, userId, description);
     }
 
     @PutMapping("/task/project/assign/{taskId}")

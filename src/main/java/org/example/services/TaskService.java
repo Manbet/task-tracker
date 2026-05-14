@@ -4,16 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.dto.requests.ChangeWatcherRequest;
 import org.example.dto.requests.CreateTaskRequest;
-import org.example.dto.requests.ModifyTaskRequest;
 import org.example.dto.responses.TaskResponse;
-import org.example.entities.CommentEntity;
 import org.example.entities.ProjectEntity;
 import org.example.entities.TaskEntity;
 import org.example.entities.UserEntity;
 import org.example.enums.TaskStatus;
 import org.example.exceptions.ForbiddenException;
 import org.example.exceptions.NoSuchEntityException;
-import org.example.repositories.CommentRepository;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.TaskRepository;
 import org.example.repositories.UserRepository;
@@ -30,17 +27,16 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
-    private final CommentRepository commentRepository;
 
     public void createTask(CreateTaskRequest request) {
-        log.info("Creating task");
+        log.info("Creating task...");
         ProjectEntity project = projectRepository.findById(request.getProjectId())
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("Project with id {0} does not exist", request.getProjectId())));
         final UserEntity reporter = userRepository.findById(request.getReporter())
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("User with id {0} not found", request.getReporter())));
-        if (project.isOpen() || project.getUsers().contains(reporter)) {
+        if (projectRepository.isAccessible(project.getId(), request.getReporter())) {
             final TaskEntity newTask = new TaskEntity();
             newTask.setTitle(request.getTitle());
             newTask.setDescription(request.getDescription());
@@ -59,23 +55,13 @@ public class TaskService {
         }
     }
 
-    public void modifyTask(long taskId, long userId, ModifyTaskRequest request) {
+    public void modifyTask(long taskId, long userId, String description) {
         log.info("Modifying task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("Task with id {0} not found", taskId)));
-        if (task.getProject().isOpen() || task.getProject().getUsers()
-                .stream().anyMatch(x -> x.getId() == userId)) {
-            UserEntity user = userRepository.findById(userId)
-                    .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                            .format("User with id {0} not found", userId)));
-            CommentEntity comment = commentRepository.findById(request.getCommentId())
-                    .orElse(new CommentEntity(user, request.getCommentText(),
-                    task, LocalDateTime.now(), LocalDateTime.now()));
-            // Повторение?
-            comment.setText(request.getCommentText());
-            task.getComments().add(comment);
-            task.setDescription(request.getDescription());
+        if (projectRepository.isAccessible(task.getProject().getId(), userId)) {
+            task.setDescription(description);
             taskRepository.save(task);
             log.info("Modified task");
         } else {
@@ -95,17 +81,13 @@ public class TaskService {
             final ProjectEntity project = projectRepository.findById(projectId)
                     .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                             .format("Project with id {0} not found", projectId)));
-            final UserEntity user = userRepository.findById(userId)
-                    .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                            .format("User with id {0} not found", userId)));
-            if (project.isOpen() || project.getUsers().contains(user)) {
+            if (projectRepository.isAccessible(project.getId(), userId)) {
                 task.setProject(project);
                 project.getTasks().add(task);
                 taskRepository.save(task);
                 projectRepository.save(project);
                 log.info("Assigned task with id {} to a project with id {}", task.getId(), project.getId());
             } else {
-                // Повторение?
                 log.warn("User with id {} tried to reassign task", userId);
                 throw new ForbiddenException(MessageFormat
                         .format("User with id {0} does not belong to this task", userId));
@@ -142,8 +124,7 @@ public class TaskService {
         final UserEntity assignee = userRepository.findById(assigneeId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("User with id {0} not found", assigneeId)));
-        if (task.getProject().isOpen() || task.getProject().getUsers()
-                .stream().anyMatch(x -> x.getId() == assigneeId)) {
+        if (projectRepository.isAccessible(task.getProject().getId(), assigneeId)) {
             task.setAssignee(assignee);
             taskRepository.save(task);
             log.info("Assigned user with id {} as an assignee to a task with id {}", assigneeId, taskId);
@@ -159,8 +140,7 @@ public class TaskService {
         final TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("No task with id {0}", taskId)));
-        if (task.getProject().isOpen() || task.getProject().getUsers()
-                .stream().anyMatch(x -> x.getId() == assigneeId)) {
+        if (projectRepository.isAccessible(task.getProject().getId(), assigneeId)) {
             task.setAssignee(null);
             taskRepository.save(task);
             log.info("Removed assignee from a task");
@@ -179,8 +159,7 @@ public class TaskService {
         final UserEntity watcher = userRepository.findById(watcherId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("User with id {0} not found", watcherId)));
-        if (task.getProject().isOpen() || task.getProject().getUsers().stream()
-                .anyMatch(x -> x.getId() == watcherId)) {
+        if (projectRepository.isAccessible(task.getProject().getId(), watcherId)) {
             task.getWatchers().add(watcher);
             taskRepository.save(task);
             log.info("Added user as a watcher to a task");
@@ -199,8 +178,7 @@ public class TaskService {
         final UserEntity watcher = userRepository.findById(request.getWatcherId())
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("User with id {0} not found", request.getWatcherId())));
-        if (task.getProject().isOpen() || task.getProject().getUsers()
-                .stream().anyMatch(x -> x.getId() == watcher.getId())) {
+        if (projectRepository.isAccessible(task.getProject().getId(), watcher.getId())) {
             task.getWatchers().remove(watcher);
             taskRepository.save(task);
             log.info("Removed watcher with id {} from a task with id {}", watcher.getId(), task.getId());
@@ -212,13 +190,13 @@ public class TaskService {
     }
 
     public TaskResponse findById(long taskId, long userId) {
-        final TaskEntity task = taskRepository.findOpenById(taskId, userId);
+        final TaskEntity task = taskRepository.findAccessableById(taskId, userId);
         if (task != null) {
             TaskResponse taskResponse = new TaskResponse(task);
             log.info("Found task with id {}", task.getId());
             return taskResponse;
         } else {
-            log.info("Task with id {} not found",  taskId);
+            log.info("Task with id {} not found", taskId);
             throw new NoSuchEntityException(MessageFormat
                     .format("No task with id {0}", taskId));
         }

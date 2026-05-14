@@ -32,7 +32,6 @@ public class ProjectService {
         project.setOpen(createProjectRequest.isOpened());
         projectRepository.save(project);
         log.info("Project {} created", project.getId());
-        MDC.clear();
     }
 
     public void deleteProject(long projectId, long userId) {
@@ -52,7 +51,6 @@ public class ProjectService {
             throw new ForbiddenException(MessageFormat
                     .format("User with id {0} is forbidden", userId));
         }
-        MDC.clear();
     }
 
     public void modifyProject(long projectId, long userId, ModifyProjectRequest request) {
