@@ -46,6 +46,7 @@ public class TaskService {
             newTask.setReporter(reporter);
             newTask.getWatchers().add(reporter);
             newTask.setStatus(TaskStatus.IDLE);
+            newTask.setProject(project);
             taskRepository.save(newTask);
             log.info("Created task with id {}", newTask.getId());
         } else {
@@ -190,7 +191,7 @@ public class TaskService {
     }
 
     public TaskResponse findById(long taskId, long userId) {
-        final TaskEntity task = taskRepository.findAccessableById(taskId, userId);
+        final TaskEntity task = taskRepository.findAccessibleById(taskId, userId);
         if (task != null) {
             TaskResponse taskResponse = new TaskResponse(task);
             log.info("Found task with id {}", task.getId());

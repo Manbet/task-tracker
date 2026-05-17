@@ -19,7 +19,7 @@ public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
     int findExpiredTasks();
 
     @NativeQuery(value = "select * from tasks, projects, project_users where tasks.id = ?1 and (projects.id = tasks.project and (projects.is_open or project_users.user_id = ?2))")
-    TaskEntity findAccessableById(long taskId, long userId);
+    TaskEntity findAccessibleById(long taskId, long userId);
 
     @NativeQuery(value = "select * from tasks, projects, project_users where projects.id = tasks.project and (projects.is_open or project_users.user_id = ?1)")
     List<TaskEntity> findAllOpen(long userId);

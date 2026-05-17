@@ -28,7 +28,7 @@ public class CommentService {
         final UserEntity user = userRepository.findById(authorId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("User with id {0} not found", authorId)));
-        final TaskEntity task = taskRepository.findAccessableById(taskId, authorId);
+        final TaskEntity task = taskRepository.findAccessibleById(taskId, authorId);
         if (task != null) {
             CommentEntity comment = new CommentEntity(user, text, task, LocalDateTime.now(), LocalDateTime.now());
             log.info("Created comment with id {}", comment.getId());
@@ -41,7 +41,7 @@ public class CommentService {
 
     public void modifyComment(long taskId, long userId, long commentId, String commentText) {
         log.info("Modifying comment with id {}", commentId);
-        TaskEntity task = taskRepository.findAccessableById(taskId, userId);
+        TaskEntity task = taskRepository.findAccessibleById(taskId, userId);
         if (task != null) {
             CommentEntity comment = commentRepository.findById(commentId)
                     .orElseThrow(() -> new NoSuchEntityException(MessageFormat
@@ -58,7 +58,7 @@ public class CommentService {
 
     public void deleteComment(long commentId, long taskId, long userId) {
         log.info("Deleting comment with id {}", commentId);
-        TaskEntity task = taskRepository.findAccessableById(taskId, userId);
+        TaskEntity task = taskRepository.findAccessibleById(taskId, userId);
         if (task != null) {
             commentRepository.deleteById(commentId);
             log.info("Deleted comment with id {}", commentId);

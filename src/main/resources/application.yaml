@@ -16,9 +16,9 @@ spring:
       properties:
         hibernate:
           format_sql: true
-app:
+application:
   jobs:
     notify-deadlines:
       cron: "0 0 0 * * *"
-    flush-expired-tasks:
+    flush:
       cron: "0 0 0 * * *"

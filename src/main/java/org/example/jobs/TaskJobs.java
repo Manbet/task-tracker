@@ -23,7 +23,7 @@ public class TaskJobs {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
 
-    @Scheduled(cron = "${app.jobs.notify-deadlines.cron}")
+    @Scheduled(cron = "${application.jobs.notify-deadlines.cron:0 0 0 * * *}")
     public void notifyDeadlines() {
         log.info("Notifying deadlines");
         taskRepository.findDeadlines();
@@ -40,7 +40,7 @@ public class TaskJobs {
         }
     }
 
-    @Scheduled(cron = "${app.jobs.flush-expired-tasks.cron}")
+    @Scheduled(cron = "${application.jobs.flush.cron:0 0 0 * * *}")
     public void flushExpiredTasks() {
         log.info("Trying to flush expired tasks");
         int size = taskRepository.findExpiredTasks();

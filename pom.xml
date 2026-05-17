@@ -98,6 +98,11 @@
                         <id>post-integration-test</id>
                         <goals><goal>stop</goal></goals>
                     </execution>
+                    <execution>
+                        <goals>
+                            <goal>build-image-no-fork</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
