@@ -8,8 +8,10 @@ import org.example.enums.Gender;
 @Data
 public class CreateUserRequest {
     @NotBlank
-    private final String name;
+    private String username;
     @NotBlank
+    private String password;
+    private final String name;
     private final String surname;
     @NotNull
     private final Gender gender;

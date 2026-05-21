@@ -20,11 +20,17 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "username")
+    private String username;
+
     @Column(name = "name")
     private String name;
 
     @Column(name = "surname")
     private String surname;
+
+    @Column(name = "password")
+    private String password;
 
     @Column(name = "birth_date")
     private LocalDateTime birthDate;

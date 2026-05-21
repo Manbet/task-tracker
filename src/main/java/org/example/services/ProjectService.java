@@ -12,6 +12,7 @@ import org.example.exceptions.NoSuchEntityException;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.UserRepository;
 import org.slf4j.MDC;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
