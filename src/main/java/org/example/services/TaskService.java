@@ -14,7 +14,6 @@ import org.example.exceptions.NoSuchEntityException;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.TaskRepository;
 import org.example.repositories.UserRepository;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -29,7 +28,6 @@ public class TaskService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
-    @PreAuthorize("#reporter == user.id or hasRole('ADMIN')")
     public void createTask(CreateTaskRequest request) {
         log.info("Creating task...");
         ProjectEntity project = projectRepository.findById(request.getProjectId())
@@ -58,7 +56,6 @@ public class TaskService {
         }
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
     public void modifyTask(long taskId, long userId, String description) {
         log.info("Modifying task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -75,7 +72,6 @@ public class TaskService {
         }
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
     public void assignToProject(long taskId, long userId, long projectId) {
         log.info("Assigning to project with id {}", projectId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -104,7 +100,6 @@ public class TaskService {
         }
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
     public void changeStatus(long taskId, long userId, String taskStatus) {
         log.info("Changing status of task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -122,7 +117,6 @@ public class TaskService {
         }
     }
 
-    @PreAuthorize("#assigneeId == user.id or hasRole('ADMIN')")
     public void changeAssignee(long taskId, long assigneeId) {
         log.info("Changing assignee of task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -142,7 +136,6 @@ public class TaskService {
         }
     }
 
-    @PreAuthorize("#assigneeId == user.id or hasRole('ADMIN')")
     public void removeAssignee(long taskId, long assigneeId) {
         log.info("Removing assignee with id {} from task with id {}", assigneeId, taskId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -159,7 +152,6 @@ public class TaskService {
         }
     }
 
-    @PreAuthorize("#watcherId == user.id or hasRole('ADMIN')")
     public void addWatcher(long taskId, long watcherId) {
         log.info("Adding watcher with id {} to a task with id {}", watcherId, taskId);
         final TaskEntity task = taskRepository.findById(taskId)
@@ -179,7 +171,6 @@ public class TaskService {
         }
     }
 
-    @PreAuthorize("#watcherId == user.id or hasRole('ADMIN')")
     public void removeWatcher(ChangeWatcherRequest request) {
         log.info("Removing watcher with id {} from task with  id {}", request.getTaskId(), request.getTaskId());
         final TaskEntity task = taskRepository.findById(request.getTaskId())
@@ -199,7 +190,6 @@ public class TaskService {
         }
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
     public TaskResponse findById(long taskId, long userId) {
         final TaskEntity task = taskRepository.findAccessibleById(taskId, userId);
         if (task != null) {
@@ -213,7 +203,6 @@ public class TaskService {
         }
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
     public List<TaskResponse> findAll(long userId) {
         List<TaskEntity> taskEntities = taskRepository.findAllOpen(userId);
         List<TaskResponse> taskResponses = taskEntities.stream().map(TaskResponse::new).toList();

@@ -7,17 +7,13 @@ import org.example.dto.requests.ModifyUserRequest;
 import org.example.dto.responses.UserResponse;
 import org.example.entities.ProjectEntity;
 import org.example.entities.UserEntity;
-import org.example.exceptions.EmailExistsException;
 import org.example.exceptions.NoSuchEntityException;
 import org.example.repositories.ProjectRepository;
-import org.example.repositories.RoleRepository;
 import org.example.repositories.UserRepository;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
-import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -26,28 +22,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
 
-    @PreAuthorize("hasRole('ADMIN')")
-    public void createUser(CreateUserRequest createUserRequest) throws EmailExistsException {
+    public void createUser(CreateUserRequest createUserRequest) {
         log.info("Creating user...");
-        if (userRepository.emailExist(createUserRequest.getEmail())) {
-            throw new EmailExistsException
-                    ("There is an account with that email address: " + createUserRequest.getEmail());
-        }
-        UserEntity user = new UserEntity();
-
-        user.setUsername(createUserRequest.getName());
-        user.setSurname(createUserRequest.getSurname());
-        user.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
-        user.setEmail(createUserRequest.getEmail());
-
-        user.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")));
-        userRepository.save(user);
-        log.info("Created user with id {}", user.getId());
+        final UserEntity userEntity = new UserEntity();
+        userEntity.setName(createUserRequest.getName());
+        userEntity.setSurname(createUserRequest.getSurname());
+        userEntity.setGender(createUserRequest.getGender());
+        userEntity.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
+        userEntity.setActive(true);
+        userRepository.save(userEntity);
+        log.info("Created user with id {}", userEntity.getId());
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
     public void assignToProject(long userId, long projectId) {
         log.info("Assigning user with id {} to project with id {}",  userId, projectId);
         final ProjectEntity project = projectRepository.findById(projectId)
@@ -62,7 +49,6 @@ public class UserService {
         log.info("Assigned user with id {}", user.getId());
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
     public void modifyUser(long userId, ModifyUserRequest modifyUserRequest) {
         log.info("Modifying user: {}", modifyUserRequest);
         UserEntity entity = userRepository.findById(userId)
@@ -82,7 +68,6 @@ public class UserService {
         return userResponse;
     }
 
-    @PreAuthorize("#id == user.id or hasRole('ADMIN')")
     public void deleteUserById(long id) {
         log.info("Deleting user with id {}", id);
         final UserEntity userEntity = userRepository.findById(id)

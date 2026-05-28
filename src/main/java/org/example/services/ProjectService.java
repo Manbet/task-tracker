@@ -25,7 +25,6 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
 
-    @PreAuthorize("hasRole('ADMIN')")
     public void createProject(CreateProjectRequest createProjectRequest) {
         log.info("Creating project {}", createProjectRequest);
         ProjectEntity project = new ProjectEntity();
@@ -36,7 +35,6 @@ public class ProjectService {
         log.info("Project {} created", project.getId());
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
     public void deleteProject(long projectId, long userId) {
         log.info("Deleting project with id {}", projectId);
         final ProjectEntity project = projectRepository.findById(projectId)
@@ -56,7 +54,6 @@ public class ProjectService {
         }
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
     public void modifyProject(long projectId, long userId, ModifyProjectRequest request) {
         log.info("Modifying project with id {}", projectId);
         final ProjectEntity project = projectRepository.findById(projectId)
@@ -76,7 +73,6 @@ public class ProjectService {
         MDC.clear();
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
     public ProjectResponse getProjectById(long projectId, long userId) {
         log.info("Getting project by id{}", projectId);
         final ProjectEntity projectEntity = projectRepository.findById(projectId)
@@ -96,7 +92,6 @@ public class ProjectService {
         }
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
     public ProjectResponse getProjectByName(String name, long userId) {
         log.info("Getting project by name {}", name);
         final ProjectEntity project = projectRepository.findByName(name);
@@ -116,7 +111,6 @@ public class ProjectService {
         }
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
     public List<ProjectResponse> findAllProjects(long userId) {
         log.info("Finding all projects");
         List<ProjectEntity> projects = projectRepository.findAllOpen(userId);

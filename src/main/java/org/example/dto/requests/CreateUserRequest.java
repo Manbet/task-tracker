@@ -13,8 +13,6 @@ public class CreateUserRequest {
     private String password;
     private final String name;
     private final String surname;
-    @NotBlank
-    private String email;
     @NotNull
     private final Gender gender;
 }
