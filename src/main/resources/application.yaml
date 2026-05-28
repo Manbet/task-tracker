@@ -22,3 +22,6 @@ application:
       cron: "0 0 0 * * *"
     flush:
       cron: "0 0 0 * * *"
+logging:
+  level:
+    org.springframework.security: debug
