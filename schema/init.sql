@@ -16,10 +16,8 @@ create table if not exists tasks
 create table if not exists users
 (
     id         bigserial primary key,
-    username   varchar(255) not null,
-    password   varchar(255) not null,
-    name       varchar(255),
-    surname    varchar(255),
+    name       varchar(255) not null,
+    surname    varchar(255) not null,
     gender     varchar(255) not null,
     birth_date timestamp without time zone,
     is_active  boolean
@@ -101,5 +99,5 @@ from tasks t
          join users u on tw.user_id = u.id
 where t.title = 'разбор ошибок';
 
-insert into users (id, username, password, gender, is_active)
+insert into users (id, name, surname, gender, is_active)
 values (0, 'bot', 'system_user', 'SYSTEM', true)

@@ -3,7 +3,7 @@ server:
   port: 8081
 spring:
   datasource:
-    url: jdbc:postgresql://host.docker.internal:5432/task-tracker
+    url: jdbc:postgresql://localhost:5432/task-tracker
     username: admin
     password: admin
   jpa:

@@ -10,7 +10,6 @@ import org.example.entities.UserEntity;
 import org.example.exceptions.NoSuchEntityException;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -21,7 +20,6 @@ import java.text.MessageFormat;
 public class UserService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
-    private final PasswordEncoder passwordEncoder;
 
     public void createUser(CreateUserRequest createUserRequest) {
         log.info("Creating user...");
@@ -29,7 +27,6 @@ public class UserService {
         userEntity.setName(createUserRequest.getName());
         userEntity.setSurname(createUserRequest.getSurname());
         userEntity.setGender(createUserRequest.getGender());
-        userEntity.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
         userEntity.setActive(true);
         userRepository.save(userEntity);
         log.info("Created user with id {}", userEntity.getId());
