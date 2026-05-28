@@ -32,11 +32,17 @@ public class UserEntity {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "email")
+    private String email;
+
     @Column(name = "birth_date")
     private LocalDateTime birthDate;
 
     @Column(name = "is_active")
     private boolean isActive;
+
+    @Column(name = "token_expired")
+    private boolean tokenExpired;
 
     @Column(name = "gender")
     @Enumerated(EnumType.STRING)
@@ -53,4 +59,12 @@ public class UserEntity {
 
     @ManyToMany(mappedBy = "users")
     private List<ProjectEntity> projects = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "roles_users",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
+    )
+    private List<RoleEntity> roles = new ArrayList<>();
 }
