@@ -18,9 +18,15 @@ public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
     @NativeQuery(value = "delete from tasks where (current_timestamp - due_time) > interval '1 year'")
     int findExpiredTasks();
 
-    @NativeQuery(value = "select * from tasks, projects, project_users where tasks.id = ?1 and (projects.id = tasks.project and (projects.is_open or project_users.user_id = ?2))")
-    TaskEntity findAccessibleById(long taskId, long userId);
+    @NativeQuery(value = "select * " +
+            "from tasks, projects, project_users " +
+            "where tasks.id = ?1 and (projects.id = tasks.project and " +
+            "(projects.is_open or project_users.user_id = (select username from users where username = ?2)))")
+    TaskEntity findAccessibleByUsername(long taskId, String username);
 
-    @NativeQuery(value = "select * from tasks, projects, project_users where projects.id = tasks.project and (projects.is_open or project_users.user_id = ?1)")
-    List<TaskEntity> findAllOpen(long userId);
+    @NativeQuery(value = "select * " +
+            "from tasks, projects, project_users " +
+            "where projects.id = tasks.project and " +
+            "(projects.is_open or project_users.user_id = (select username from users where username = ?1))")
+    List<TaskEntity> findAllOpen(String username);
 }

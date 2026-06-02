@@ -7,7 +7,9 @@ import org.example.enums.Gender;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -18,13 +20,22 @@ public class UserEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
+
+    @Column(name = "username", unique = true, nullable = false)
+    private String username;
 
     @Column(name = "name")
     private String name;
 
     @Column(name = "surname")
     private String surname;
+
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "email",  unique = true)
+    private String email;
 
     @Column(name = "birth_date")
     private LocalDateTime birthDate;
@@ -47,4 +58,9 @@ public class UserEntity {
 
     @ManyToMany(mappedBy = "users")
     private List<ProjectEntity> projects = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private Set<String> roles = new HashSet<>();
 }
