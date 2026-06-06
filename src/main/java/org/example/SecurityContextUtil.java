@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.entities.UserEntity;
+import org.example.pojo.User;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,11 +15,12 @@ import static java.util.Optional.ofNullable;
 
 @Component
 public class SecurityContextUtil {
-    public Optional<UserDetails> getCurrentUser() {
+
+    public Optional<User> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return ofNullable(authentication)
                 .filter(a -> a.isAuthenticated() && !(a instanceof AnonymousAuthenticationToken))
-                .map(a -> a.getPrincipal() instanceof UserDetails ud ? ud : null);
+                .map(a -> a.getPrincipal() instanceof User u ? u : null);
     }
 
     public boolean hasAuthority(String authority) {

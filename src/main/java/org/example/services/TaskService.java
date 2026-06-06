@@ -12,6 +12,7 @@ import org.example.entities.UserEntity;
 import org.example.enums.TaskStatus;
 import org.example.exceptions.ForbiddenException;
 import org.example.exceptions.NoSuchEntityException;
+import org.example.pojo.User;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.TaskRepository;
 import org.example.repositories.UserRepository;
@@ -40,10 +41,10 @@ public class TaskService {
         final UserEntity reporter = userRepository.findById(request.getReporter())
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                                 .format("User with id {0} not found", request.getReporter())));
-        UserDetails user = securityContextUtil.getCurrentUser()
+        User user = securityContextUtil.getCurrentUser()
                 .orElseThrow(() -> new AccessDeniedException("Authorization failed"));
-        if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
-//        if (projectRepository.isAccessible(project.getId(), request.getReporter())) {
+//        if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
+        if (projectRepository.isAccessible(project.getId(), user.getId())) {
             final TaskEntity newTask = new TaskEntity();
             newTask.setTitle(request.getTitle());
             newTask.setDescription(request.getDescription());
