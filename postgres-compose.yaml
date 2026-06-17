@@ -1,15 +1,15 @@
 version: "3.9"
 services:
-  app:
-    build: .
+  task-tracker:
+    image: task-tracker:1.0-SNAPSHOT
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
       - task-tracker-postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://task-tracker-postgres:5432/task-tracker
-      SPRING_DATASOURCE_USERRNAME: admin
-      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_CONFIG_LOCATION: /config/application.yaml
+    volumes:
+      - ./src/main/resources/application.yaml:/config/application.yaml
   task-tracker-postgres:
     image: postgres:16.3
     environment:

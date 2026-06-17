@@ -42,8 +42,8 @@ public class ProjectService {
                         .format("Project with id {0} not found", projectId)));
         UserDetails user = securityContextUtil.getCurrentUser()
                 .orElseThrow(() -> new AccessDeniedException("Authorization failed"));
-//        if (project.getUsers().contains(user)) {
-        if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
+        if (project.getUsers().contains(user)) {
+//        if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
             project.setActive(false);
             projectRepository.save(project);
             log.info("Project {} deleted", projectId);
@@ -61,8 +61,8 @@ public class ProjectService {
                         .format("Project with id {0} not found", projectId)));
         UserDetails user = securityContextUtil.getCurrentUser()
                 .orElseThrow(() -> new AccessDeniedException("Authorization failed"));
-//        if (project.getUsers().contains(user)) {
-        if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
+        if (project.getUsers().contains(user)) {
+//        if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
             project.setName(request.getName());
             project.setDescription(request.getDescription());
         } else {
@@ -79,8 +79,8 @@ public class ProjectService {
                         .format("Project with id {0} does not exist", projectId)));
         UserDetails user = securityContextUtil.getCurrentUser()
                 .orElseThrow(() -> new AccessDeniedException("Authorization failed"));
-//        if (projectEntity.isOpen() || projectEntity.getUsers().contains(user)) {
-        if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
+        if (projectEntity.isOpen() || projectEntity.getUsers().contains(user)) {
+//        if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
             log.info("Project {} found by id", projectEntity.getId());
             MDC.clear();
             return new ProjectResponse(projectEntity);
@@ -99,8 +99,8 @@ public class ProjectService {
         if (project == null) {
             throw new NoSuchEntityException(MessageFormat
                     .format("Project with name {0} does not exist", name));
-//        } else if (project.isOpen() || project.getUsers().contains(user)) {
-        } else if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
+        } else if (project.isOpen() || project.getUsers().contains(user)) {
+//        } else if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
             log.info("Project {} found by name {}", project.getId(), project.getName());
             return new ProjectResponse(project);
         } else {
@@ -112,8 +112,7 @@ public class ProjectService {
 
     public List<ProjectResponse> findAllProjects() {
         log.info("Finding all projects");
-        UserDetails user = securityContextUtil.getCurrentUser()
-                .orElseThrow(() -> new AccessDeniedException("Authorization failed"));
+        UserDetails user = securityContextUtil.getCurrentUser().orElse(null);
         List<ProjectEntity> projects = projectRepository.findAllOpen(user.getUsername());
         List<ProjectResponse> projectResponses = projects.stream().map(ProjectResponse::new).toList();
         log.info("Found {} projects", projects.size());

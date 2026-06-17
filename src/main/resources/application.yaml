@@ -21,6 +21,11 @@ spring:
       properties:
         hibernate:
           format_sql: true
+session:
+  store-type: jdbc
+  jdbc:
+    initialize-schema: always
+    table-name: SPRING_SESSION
 application:
   jobs:
     notify-deadlines:

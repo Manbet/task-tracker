@@ -23,7 +23,7 @@ create table if not exists users
     password   varchar(255) not null,
     gender     varchar(255) not null,
     birth_date timestamp without time zone,
-    role       text[],
+--     role       varchar(255) not null,
     is_active  boolean
 );
 
@@ -62,8 +62,8 @@ create table if not exists project_users
 
 create table if not exists user_roles
 (
-    user_id bigint not null primary key,
-    role varchar(255) not null
+    user_id bigint       not null primary key,
+    role    varchar(255) not null
 );
 
 --1, 2, 3, 4
@@ -109,5 +109,6 @@ from tasks t
          join users u on tw.user_id = u.id
 where t.title = 'разбор ошибок';
 
-insert into users (id, username, gender, role, is_active)
-values (0, 'bot', 'SYSTEM', 'ADMIN', true)
+insert into users (username, gender, password, email, is_active)
+values ('bot', 'SYSTEM', 'admin', 'bot@example.com', true)
+returning id;

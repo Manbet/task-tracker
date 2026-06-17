@@ -17,6 +17,7 @@ import org.example.repositories.ProjectRepository;
 import org.example.repositories.TaskRepository;
 import org.example.repositories.UserRepository;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +65,7 @@ public class TaskService {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('READ')")
     public void modifyTask(long taskId, String description) {
         log.info("Modifying task with id {}", taskId);
         final TaskEntity task = taskRepository.findById(taskId)

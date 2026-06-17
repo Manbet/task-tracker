@@ -6,7 +6,13 @@ import lombok.Data;
 import org.example.enums.Gender;
 
 @Data
-public class CreateUserRequest {
+public class RegistrationRequest {
+    @NotBlank
+    private final String username;
+    @NotBlank
+    private final String password;
+    @NotBlank
+    private final String email;
     @NotBlank
     private final String name;
     @NotBlank

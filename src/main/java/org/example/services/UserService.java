@@ -2,14 +2,15 @@ package org.example.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.dto.requests.CreateUserRequest;
 import org.example.dto.requests.ModifyUserRequest;
+import org.example.dto.requests.RegistrationRequest;
 import org.example.dto.responses.UserResponse;
 import org.example.entities.ProjectEntity;
 import org.example.entities.UserEntity;
 import org.example.exceptions.NoSuchEntityException;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -20,13 +21,17 @@ import java.text.MessageFormat;
 public class UserService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public void createUser(CreateUserRequest createUserRequest) {
+    public void createUser(RegistrationRequest request) {
         log.info("Creating user...");
         final UserEntity userEntity = new UserEntity();
-        userEntity.setName(createUserRequest.getName());
-        userEntity.setSurname(createUserRequest.getSurname());
-        userEntity.setGender(createUserRequest.getGender());
+        userEntity.setUsername(request.getUsername());
+        userEntity.setName(request.getName());
+        userEntity.setEmail(request.getEmail());
+        userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
+        userEntity.setSurname(request.getSurname());
+        userEntity.setGender(request.getGender());
         userEntity.setActive(true);
         userRepository.save(userEntity);
         log.info("Created user with id {}", userEntity.getId());
