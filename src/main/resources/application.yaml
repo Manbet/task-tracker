@@ -11,6 +11,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/task-tracker
     username: admin
     password: admin
+    driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
@@ -18,14 +19,15 @@ spring:
       ddl-auto: none
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
-      properties:
-        hibernate:
-          format_sql: true
-session:
-  store-type: jdbc
-  jdbc:
-    initialize-schema: always
-    table-name: SPRING_SESSION
+    properties:
+      hibernate:
+        format_sql: true
+  session:
+    jdbc:
+      initialize-schema: always
+      table-name: spring_session
+      cleanup-cron: "0 */5 * * * *"
+    timeout: 1800
 application:
   jobs:
     notify-deadlines:

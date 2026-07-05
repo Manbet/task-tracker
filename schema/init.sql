@@ -66,49 +66,31 @@ create table if not exists user_roles
     role    varchar(255) not null
 );
 
---1, 2, 3, 4
---5, 6
+create table spring_session
+(
+    primary_id            char(36) not null,
+    session_id            char(36) not null,
+    creation_time         bigint   not null,
+    last_access_time      bigint   not null,
+    max_inactive_interval int      not null,
+    expiry_time           bigint   not null,
+    principal_name        varchar(100),
+    constraint spring_session_PK primary key (primary_id)
+);
 
---one to
---table task
---reporter | assignee
---1        | 4
---2        | 1
---3        | 4
---4        | 3
---1        | 2
---4        | 1
+create unique index spring_session_ix1 on spring_session (session_id);
+create index spring_session_ix2 on spring_session (expiry_time);
+create index spring_session_ix3 on spring_session (principal_name);
 
-select *
-from tasks t
-         join users u on t.reporter = u.id
-where u.name = 'Павел';
-select *
-from tasks t
-         join users u on t.assignee = u.id
-where u.name = 'Петр';
-
---many to many
---task_id | user_id
---5       | 1
---5       | 2
---5       | 3
---5       | 4
---6       | 1
---6       | 4
-
-select t.*
-from tasks t
-         join task_watchers tw on t.id = tw.task_id
-         join users u on tw.user_id = u.id
-where u.name = 'Эмин';
-
-select u.*
-from tasks t
-         join task_watchers tw on t.id = tw.task_id
-         join users u on tw.user_id = u.id
-where t.title = 'разбор ошибок';
+create table spring_session_attributes
+(
+    session_primary_id char(36)     not null,
+    attribute_name     varchar(200) not null,
+    attribute_bytes    bytea        not null,
+    constraint spring_session_attributes_PK primary key (session_primary_id, attribute_name),
+    constraint spring_session_attributes_FK foreign key (session_primary_id) references spring_session (primary_id) on delete cascade
+);
 
 insert into users (username, gender, password, email, is_active)
-values ('bot', 'SYSTEM', 'admin', 'bot@example.com', true)
+values ('bot', 'SYSTEM', 'admin', 'bot@mail.com', true)
 returning id;

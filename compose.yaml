@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   task-tracker:
     image: task-tracker:1.0-SNAPSHOT
