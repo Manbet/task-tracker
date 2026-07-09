@@ -28,12 +28,39 @@ spring:
       table-name: spring_session
       cleanup-cron: "0 */5 * * * *"
     timeout: 1800
+  Kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true
+    consumer:
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.value.default.type: org.example.kafka.UserEvent
+        spring.json.trusted.packages: "*"
+  mail:
+    host: smtp.yandex.ru
+    port: 587
+    username: eminkaribov06@yandex.ru
+    password: 12345
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 application:
   jobs:
     notify-deadlines:
       cron: "0 0 0 * * *"
     flush:
       cron: "0 0 0 * * *"
+  Kafka:
+    topics:
+      test: test-topic
+      email: email-topic
 logging:
   level:
     org.springframework.security: debug

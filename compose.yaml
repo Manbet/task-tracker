@@ -4,12 +4,12 @@ services:
     ports:
       - "8081:8080"
     depends_on:
-      - task-tracker-postgres
+      - postgres
     environment:
       SPRING_CONFIG_LOCATION: /config/application.yaml
     volumes:
       - ./src/main/resources/application.yaml:/config/application.yaml
-  task-tracker-postgres:
+  postgres:
     image: postgres:16.3
     environment:
       POSTGRES_DB: "task-tracker"
@@ -19,7 +19,7 @@ services:
       - "5432:5432"
     volumes:
       - ./schema/init.sql:/docker-entrypoint-init.db/init.sql
-  kafka:
+  Kafka:
     image: confluentinc/cp-kafka:latest
     container_name: kafka
     ports:
