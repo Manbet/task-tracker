@@ -34,12 +34,7 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.add.type.headers: true
-    consumer:
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.value.default.type: org.example.kafka.UserEvent
-        spring.json.trusted.packages: "*"
+        spring.json.add.type.headers: false
   mail:
     host: smtp.yandex.ru
     port: 587

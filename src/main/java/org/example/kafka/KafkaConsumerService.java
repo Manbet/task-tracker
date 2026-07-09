@@ -1,7 +1,10 @@
 package org.example.kafka;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -16,13 +19,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KafkaConsumerService {
     private final JavaMailSender mailSender;
+    private final ObjectMapper objectMapper;
 
     @Value("${spring.mail.username}")
     private String username;
 
-    @KafkaListener(topics = "${application.Kafka.topics.test}", groupId = "user-group")
+    @SneakyThrows
+    @KafkaListener(topics = "${application.Kafka.topics.test}", groupId = "user-group", contentTypeConverter = "jacksonMessageConverter")
     public void listen(
-            @Payload UserEvent event,
+            @Payload CoolestUserEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset) {

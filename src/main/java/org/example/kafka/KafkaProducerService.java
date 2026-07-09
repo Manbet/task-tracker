@@ -1,6 +1,7 @@
 package org.example.kafka;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -8,6 +9,7 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class KafkaProducerService {
         });
     }
 
+    @SneakyThrows
     public void sendEmailEvent (EmailMessage message) {
         log.info("Sending email: {}", message.to());
         kafkaTemplateEmail.send(KafkaTopicConfig.TOPIC_EMAIL, message);
