@@ -112,11 +112,15 @@
                 <executions>
                     <execution>
                         <id>pre-integration-test</id>
-                        <goals><goal>start</goal></goals>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
                     </execution>
                     <execution>
                         <id>post-integration-test</id>
-                        <goals><goal>stop</goal></goals>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
                     </execution>
                     <execution>
                         <goals>
@@ -132,7 +136,9 @@
                 <executions>
                     <execution>
                         <phase>integration-test</phase>
-                        <goals><goal>generate</goal></goals>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
                     </execution>
                 </executions>
                 <configuration>

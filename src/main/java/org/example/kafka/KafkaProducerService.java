@@ -1,7 +1,6 @@
 package org.example.kafka;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -14,12 +13,11 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 @Slf4j
 public class KafkaProducerService {
-    private final KafkaTemplate<String, UserEvent> kafkaTemplate;
-    private final KafkaTemplate<String, EmailMessage> kafkaTemplateEmail;
+    private final KafkaTemplate<String, EmailMessage> kafkaTemplate;
 
-    public void sendUserEvent(UserEvent event) {
-        CompletableFuture<SendResult<String, UserEvent>> future =
-                kafkaTemplate.send(KafkaTopicConfig.TOPIC_TEST, event.user(), event);
+    public void sendEmail(EmailMessage emailMessage) {
+        CompletableFuture<SendResult<String, EmailMessage>> future =
+                kafkaTemplate.send(KafkaTopicConfig.TOPIC_TEST, emailMessage.to(), emailMessage);
 
         future.whenComplete((result, ex) -> {
             if (ex == null) {
@@ -29,11 +27,5 @@ public class KafkaProducerService {
             } else
                 log.error("Error! Failed to send: {}", ex.getMessage());
         });
-    }
-
-    @SneakyThrows
-    public void sendEmailEvent (EmailMessage message) {
-        log.info("Sending email: {}", message.to());
-        kafkaTemplateEmail.send(KafkaTopicConfig.TOPIC_EMAIL, message);
     }
 }

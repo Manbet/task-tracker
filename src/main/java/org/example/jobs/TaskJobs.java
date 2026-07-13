@@ -6,8 +6,8 @@ import org.example.entities.CommentEntity;
 import org.example.entities.TaskEntity;
 import org.example.entities.UserEntity;
 import org.example.exceptions.NoSuchEntityException;
+import org.example.kafka.EmailMessage;
 import org.example.kafka.KafkaProducerService;
-import org.example.kafka.UserEvent;
 import org.example.repositories.TaskRepository;
 import org.example.repositories.UserRepository;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -39,7 +39,7 @@ public class TaskJobs {
             CommentEntity comment = new CommentEntity(author, duration + " Days till deadline", task,
                     LocalDateTime.now(), LocalDateTime.now());
             task.getComments().add(comment);
-            kafkaProducerService.sendUserEvent(new UserEvent(author.getEmail(),
+            kafkaProducerService.sendEmail(new EmailMessage(author.getEmail(), "Deadline notification",
                     duration + " Days till" + task.getTitle() + "deadline", LocalDateTime.now()));
             taskRepository.save(task);
         }

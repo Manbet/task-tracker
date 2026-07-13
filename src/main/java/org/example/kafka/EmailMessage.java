@@ -1,8 +1,11 @@
 package org.example.kafka;
 
+import java.time.LocalDateTime;
+
 public record EmailMessage(
         String to,
         String subject,
-        String body
+        String body,
+        LocalDateTime timestamp
 ) {
 }
