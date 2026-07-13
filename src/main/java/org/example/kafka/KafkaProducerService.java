@@ -9,7 +9,6 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +19,7 @@ public class KafkaProducerService {
 
     public void sendUserEvent(UserEvent event) {
         CompletableFuture<SendResult<String, UserEvent>> future =
-                kafkaTemplate.send(KafkaTopicConfig.TOPIC_TEST, event.getUserId(), event);
+                kafkaTemplate.send(KafkaTopicConfig.TOPIC_TEST, event.user(), event);
 
         future.whenComplete((result, ex) -> {
             if (ex == null) {

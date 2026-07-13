@@ -25,6 +25,9 @@ public class RegisterController {
 
     @GetMapping("/register")
     public String getRegistration(Principal principal) {
-        return "Вы успешно авторизованы как: " + principal.getName();
+        if (principal.getName() != null)
+            return "You are authorized as: " + principal.getName();
+        else
+            return "You are not authorized";
     }
 }

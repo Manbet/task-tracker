@@ -1,16 +1,10 @@
 package org.example.kafka;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@ToString
-public class UserEvent {
-    private String userId;
-    private String action;
-    private LocalDateTime timestamp;
+public record UserEvent(
+        String user,
+        String action,
+        LocalDateTime timestamp
+) {
 }

@@ -35,27 +35,12 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.add.type.headers: false
-  mail:
-    host: smtp.yandex.ru
-    port: 587
-    username: eminkaribov06@yandex.ru
-    password: 12345
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
 application:
   jobs:
     notify-deadlines:
       cron: "0 0 0 * * *"
     flush:
       cron: "0 0 0 * * *"
-  Kafka:
-    topics:
-      test: test-topic
-      email: email-topic
 logging:
   level:
     org.springframework.security: debug

@@ -1,6 +1,5 @@
 package org.example;
 
-import org.example.entities.UserEntity;
 import org.example.pojo.User;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
