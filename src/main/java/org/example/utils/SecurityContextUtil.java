@@ -1,4 +1,4 @@
-package org.example;
+package org.example.utils;
 
 import org.example.pojo.User;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;

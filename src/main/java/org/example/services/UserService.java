@@ -26,12 +26,12 @@ public class UserService {
     public void createUser(RegistrationRequest request) {
         log.info("Creating user...");
         final UserEntity userEntity = new UserEntity();
-        userEntity.setUsername(request.getUsername());
-        userEntity.setName(request.getName());
-        userEntity.setEmail(request.getEmail());
-        userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
-        userEntity.setSurname(request.getSurname());
-        userEntity.setGender(request.getGender());
+        userEntity.setUsername(request.username());
+        userEntity.setName(request.name());
+        userEntity.setEmail(request.email());
+        userEntity.setPassword(passwordEncoder.encode(request.password()));
+        userEntity.setSurname(request.surname());
+        userEntity.setGender(request.gender());
         userEntity.setActive(true);
         userRepository.save(userEntity);
         log.info("Created user with id {}", userEntity.getId());

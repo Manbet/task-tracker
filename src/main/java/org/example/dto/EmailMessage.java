@@ -1,4 +1,4 @@
-package org.example.kafka;
+package org.example.dto;
 
 import java.time.LocalDateTime;
 

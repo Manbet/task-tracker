@@ -1,4 +1,4 @@
-package org.example;
+package org.example.utils;
 
 import jakarta.servlet.*;
 import lombok.extern.slf4j.Slf4j;

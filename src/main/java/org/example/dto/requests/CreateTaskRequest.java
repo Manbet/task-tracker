@@ -3,17 +3,19 @@ package org.example.dto.requests;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
 public class CreateTaskRequest {
     @NotBlank
-    private final String title;
-    private final LocalDateTime dueDate;
-    private final String description;
+    private String title;
+    private LocalDateTime dueDate;
+    private String description;
     @NotNull
-    private final Long reporter;
+    private Long reporter;
     @NotNull
-    private final Long projectId;
+    private Long projectId;
 }

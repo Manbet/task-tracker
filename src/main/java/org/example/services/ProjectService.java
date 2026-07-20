@@ -2,7 +2,7 @@ package org.example.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.SecurityContextUtil;
+import org.example.utils.SecurityContextUtil;
 import org.example.dto.requests.CreateProjectRequest;
 import org.example.dto.requests.ModifyProjectRequest;
 import org.example.dto.responses.ProjectResponse;
@@ -28,8 +28,8 @@ public class ProjectService {
     public void createProject(CreateProjectRequest createProjectRequest) {
         log.info("Creating project {}", createProjectRequest);
         ProjectEntity project = new ProjectEntity();
-        project.setName(createProjectRequest.getName());
-        project.setDescription(createProjectRequest.getDescription());
+        project.setName(createProjectRequest.name());
+        project.setDescription(createProjectRequest.description());
         project.setOpen(createProjectRequest.isOpened());
         projectRepository.save(project);
         log.info("Project {} created", project.getId());
@@ -63,8 +63,8 @@ public class ProjectService {
                 .orElseThrow(() -> new AccessDeniedException("Authorization failed"));
         if (project.getUsers().contains(user)) {
 //        if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
-            project.setName(request.getName());
-            project.setDescription(request.getDescription());
+            project.setName(request.name());
+            project.setDescription(request.description());
         } else {
             log.warn("User {} tried to modify project with id {}", user.getUsername(), projectId);
             throw new ForbiddenException(MessageFormat

@@ -2,7 +2,7 @@ package org.example.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.SecurityContextUtil;
+import org.example.utils.SecurityContextUtil;
 import org.example.entities.CommentEntity;
 import org.example.entities.TaskEntity;
 import org.example.entities.UserEntity;

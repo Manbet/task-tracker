@@ -2,7 +2,7 @@ package org.example.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.SecurityContextUtil;
+import org.example.utils.SecurityContextUtil;
 import org.example.dto.requests.ChangeWatcherRequest;
 import org.example.dto.requests.CreateTaskRequest;
 import org.example.dto.responses.TaskResponse;
@@ -199,13 +199,13 @@ public class TaskService {
     }
 
     public void removeWatcher(ChangeWatcherRequest request) {
-        log.info("Removing watcher with id {} from task with  id {}", request.getTaskId(), request.getTaskId());
-        final TaskEntity task = taskRepository.findById(request.getTaskId())
+        log.info("Removing watcher with id {} from task with  id {}", request.taskId(), request.taskId());
+        final TaskEntity task = taskRepository.findById(request.taskId())
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("No task with id {0}", request.getTaskId())));
-        final UserEntity watcher = userRepository.findById(request.getWatcherId())
+                        .format("No task with id {0}", request.taskId())));
+        final UserEntity watcher = userRepository.findById(request.watcherId())
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("User with id {0} not found", request.getWatcherId())));
+                        .format("User with id {0} not found", request.watcherId())));
         UserDetails user = securityContextUtil.getCurrentUser()
                 .orElseThrow(() -> new AccessDeniedException("Authorization failed"));
 //        if (projectRepository.isAccessible(task.getProject().getId(), watcher.getId())) {

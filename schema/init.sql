@@ -22,7 +22,7 @@ create table if not exists users
     email      varchar(255) not null,
     password   varchar(255) not null,
     gender     varchar(255) not null,
-    birth_date timestamp without time zone,
+    birth_date date,
 --     role       varchar(255) not null,
     is_active  boolean
 );

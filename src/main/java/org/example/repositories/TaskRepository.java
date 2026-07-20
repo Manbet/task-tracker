@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
     @NativeQuery(value = "select * from tasks where (due_time - current_timestamp) < interval '7 days'" +
-            "or (due_time - current_timestamp) < 0.1 * due_time")
+            "or (due_time - current_timestamp) < 0.1 * (due_time - creation_time)")
     List<TaskEntity> findDeadlines();
 
     @Modifying

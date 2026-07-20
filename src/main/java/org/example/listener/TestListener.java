@@ -1,4 +1,4 @@
-package org.example.kafka.listener;
+package org.example.listener;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
