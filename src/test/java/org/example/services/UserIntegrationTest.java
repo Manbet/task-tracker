@@ -44,7 +44,10 @@ public class UserIntegrationTest {
         Assertions.assertNotNull(body);
         Assertions.assertNotNull(expectedUser);
         Assertions.assertEquals(expectedUser.getId(), body.getId());
-        Assertions.assertEquals(expectedUser.getUsername(), body.getUsername());
+        Assertions.assertEquals(expectedUser.getUsername(), body.getUsername()); //todo найти баг
+//        org.opentest4j.AssertionFailedError:
+//        Expected :bot
+//        Actual   :null
         Assertions.assertIterableEquals(expectedUser.getWatchedTasks(), body.getWaitingTasks());
         Assertions.assertIterableEquals(expectedUser.getReportedTasks(), body.getReportedTasks());
         Assertions.assertIterableEquals(expectedUser.getAssignedTasks(), body.getAssignedTasks());
@@ -64,7 +67,10 @@ public class UserIntegrationTest {
         final var body = response.getBody();
         Assertions.assertNotNull(body);
         Assertions.assertNotNull(expectedUser);
-        Assertions.assertEquals(expectedUser.getId(), body.getId());
+        Assertions.assertEquals(expectedUser.getId(), body.getId()); //todo найти баг
+//        org.opentest4j.AssertionFailedError:
+//        Expected :bot
+//        Actual   :null
         Assertions.assertEquals(expectedUser.getUsername(), body.getUsername());
         Assertions.assertIterableEquals(expectedUser.getWatchedTasks(), body.getWaitingTasks());
         Assertions.assertIterableEquals(expectedUser.getReportedTasks(), body.getReportedTasks());

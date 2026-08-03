@@ -39,7 +39,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/test",
-                                "/send"
+                                "/send",
+                                "/users"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/project/{projectId}",
@@ -75,7 +76,7 @@ public class SecurityConfig {
                         .maxSessionsPreventsLogin(false)
                         .expiredUrl("/login?expired")
                         .sessionRegistry(sessionRegistry()))
-                .httpBasic(Customizer.withDefaults())
+//                .httpBasic(Customizer.withDefaults())
                 .build();
     }
 

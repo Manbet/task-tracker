@@ -92,5 +92,5 @@ create table spring_session_attributes
 );
 
 insert into users (username, gender, password, email, is_active)
-values ('bot', 'SYSTEM', '$2a$10$XURPShQNCsLjp1ESc2laoObo9QZDhxz73hJPaEv7/cBha4pk0AgP.', 'bot@mail.com', true)
+values ('bot', 'SYSTEM', '$2a$10$XURPShQNCsLjp1ESc2laoOLHTDCW9B7UKelSiEPZaLqLKjz.baF3K', 'bot@mail.com', true)
 returning id;
