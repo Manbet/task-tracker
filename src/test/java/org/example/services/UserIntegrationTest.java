@@ -1,7 +1,7 @@
 package org.example.services;
 
+import org.example.config.SecurityConfig;
 import org.example.config.TestConfig;
-import org.example.config.TestSecurityConfig;
 import org.example.dto.responses.UserResponse;
 import org.example.repositories.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -11,12 +11,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
+
+import java.util.Base64;
 
 //@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({TestConfig.class, TestSecurityConfig.class})
+@Import({TestConfig.class, SecurityConfig.class})
 public class UserIntegrationTest {
 
     @LocalServerPort
@@ -33,7 +35,9 @@ public class UserIntegrationTest {
 
     @Test
     public void testGetUserByIdWithRestTemplate() {
-        final var response = restTemplate.getForEntity("http://localhost:%s/users/1".formatted(port), UserResponse.class);
+        final var response = restTemplate
+                .withBasicAuth("bot", "admin")
+                .getForEntity("http://localhost:%s/users/1".formatted(port), UserResponse.class);
         final var expectedUser = userRepository.findById(1L).orElse(null);
         Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
         final var body = response.getBody();
@@ -48,7 +52,13 @@ public class UserIntegrationTest {
 
     @Test
     public void testGetUserByIdWithWebClient() {
-        final var response = restClient.get().uri("http://localhost:%s/users/1".formatted(port)).retrieve().toEntity(UserResponse.class);
+        String credentials = "bot:admin";
+        String encodedCredentials = Base64.getEncoder().encodeToString(credentials.getBytes());
+        final var response = restClient.get()
+                .uri("http://localhost:%s/users/1".formatted(port))
+                .header(HttpHeaders.AUTHORIZATION, "Basic " + encodedCredentials)
+                .retrieve()
+                .toEntity(UserResponse.class);
         final var expectedUser = userRepository.findById(1L).orElse(null);
         Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
         final var body = response.getBody();
