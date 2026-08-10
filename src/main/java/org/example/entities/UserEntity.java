@@ -1,13 +1,24 @@
 package org.example.entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.enums.Gender;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -46,13 +57,13 @@ public class UserEntity {
     private Gender gender;
 
     @OneToMany(mappedBy = "reporter")
-    private List<TaskEntity> reportedTasks = new ArrayList<>();
+    private Set<TaskEntity> reportedTasks = new HashSet<>();
 
     @OneToMany(mappedBy = "assignee")
-    private List<TaskEntity> assignedTasks = new ArrayList<>();
+    private Set<TaskEntity> assignedTasks = new HashSet<>();
 
     @ManyToMany(mappedBy = "watchers")
-    private List<TaskEntity> watchedTasks = new ArrayList<>();
+    private Set<TaskEntity> watchedTasks = new HashSet<>();
 
     @ManyToMany(mappedBy = "users")
     private List<ProjectEntity> projects = new ArrayList<>();

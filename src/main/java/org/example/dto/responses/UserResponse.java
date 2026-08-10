@@ -17,7 +17,7 @@ public class UserResponse {
 
     public UserResponse(UserEntity userEntity) {
         this.id = userEntity.getId();
-        this.username = userEntity.getName();
+        this.username = userEntity.getUsername();
         this.reportedTasks = userEntity.getReportedTasks().stream().map(TaskResponse::new).toList();
         this.assignedTasks = userEntity.getAssignedTasks().stream().map(TaskResponse::new).toList();
         this.waitingTasks = userEntity.getWatchedTasks().stream().map(TaskResponse::new).toList();

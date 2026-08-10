@@ -11,15 +11,24 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
-import java.util.Base64;
+import java.util.List;
+import java.util.stream.Collectors;
 
-//@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({TestConfig.class, SecurityConfig.class})
 public class UserIntegrationTest {
+
+    private static final String USERNAME = "bot";
+    private static final String PASSWORD = "admin";
 
     @LocalServerPort
     private int port;
@@ -35,45 +44,97 @@ public class UserIntegrationTest {
 
     @Test
     public void testGetUserByIdWithRestTemplate() {
-        final var response = restTemplate
-                .withBasicAuth("bot", "admin")
-                .getForEntity("http://localhost:%s/users/1".formatted(port), UserResponse.class);
-        final var expectedUser = userRepository.findById(1L).orElse(null);
+        String cookieHeader = loginWithForm(restTemplate);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, cookieHeader);
+        final var response = restTemplate.exchange(
+                getUserUrl(),
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                UserResponse.class
+        );
+
+        assertUserResponse(response);
+    }
+
+    @Test
+    public void testGetUserByIdWithWebClient() {
+        String cookieHeader = loginWithForm(restClient);
+        final var response = restClient.get()
+                .uri(getUserUrl())
+                .header(HttpHeaders.COOKIE, cookieHeader)
+                .retrieve()
+                .toEntity(UserResponse.class);
+        assertUserResponse(response);
+    }
+
+    private void assertUserResponse(ResponseEntity<UserResponse> response) {
+        final var expectedUser = userRepository.findWithTasksById(1L).orElse(null);
         Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
         final var body = response.getBody();
         Assertions.assertNotNull(body);
         Assertions.assertNotNull(expectedUser);
         Assertions.assertEquals(expectedUser.getId(), body.getId());
-        Assertions.assertEquals(expectedUser.getUsername(), body.getUsername()); //todo найти баг
-//        org.opentest4j.AssertionFailedError:
-//        Expected :bot
-//        Actual   :null
+        Assertions.assertEquals(expectedUser.getUsername(), body.getUsername());
         Assertions.assertIterableEquals(expectedUser.getWatchedTasks(), body.getWaitingTasks());
         Assertions.assertIterableEquals(expectedUser.getReportedTasks(), body.getReportedTasks());
         Assertions.assertIterableEquals(expectedUser.getAssignedTasks(), body.getAssignedTasks());
     }
 
-    @Test
-    public void testGetUserByIdWithWebClient() {
-        String credentials = "bot:admin";
-        String encodedCredentials = Base64.getEncoder().encodeToString(credentials.getBytes());
-        final var response = restClient.get()
-                .uri("http://localhost:%s/users/1".formatted(port))
-                .header(HttpHeaders.AUTHORIZATION, "Basic " + encodedCredentials)
+    private String loginWithForm(TestRestTemplate template) {
+        final var loginResponse = template.postForEntity(
+                getLoginUrl(),
+                new HttpEntity<>(loginForm(), formUrlEncodedHeaders()),
+                String.class
+        );
+        Assertions.assertTrue(
+                loginResponse.getStatusCode().is2xxSuccessful(),
+                "Ошибка авторизации через форму логина"
+        );
+        return extractCookies(loginResponse.getHeaders());
+    }
+
+    private String loginWithForm(RestClient client) {
+        final var loginResponse = client.post()
+                .uri(getLoginUrl())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(loginForm())
                 .retrieve()
-                .toEntity(UserResponse.class);
-        final var expectedUser = userRepository.findById(1L).orElse(null);
-        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
-        final var body = response.getBody();
-        Assertions.assertNotNull(body);
-        Assertions.assertNotNull(expectedUser);
-        Assertions.assertEquals(expectedUser.getId(), body.getId()); //todo найти баг
-//        org.opentest4j.AssertionFailedError:
-//        Expected :bot
-//        Actual   :null
-        Assertions.assertEquals(expectedUser.getUsername(), body.getUsername());
-        Assertions.assertIterableEquals(expectedUser.getWatchedTasks(), body.getWaitingTasks());
-        Assertions.assertIterableEquals(expectedUser.getReportedTasks(), body.getReportedTasks());
-        Assertions.assertIterableEquals(expectedUser.getAssignedTasks(), body.getAssignedTasks());
+                .toEntity(String.class);
+        Assertions.assertTrue(
+                loginResponse.getStatusCode().is2xxSuccessful(),
+                "Ошибка авторизации через форму логина"
+        );
+        return extractCookies(loginResponse.getHeaders());
+    }
+
+    private String getLoginUrl() {
+        return "http://localhost:%s/login".formatted(port);
+    }
+
+    private String getUserUrl() {
+        return "http://localhost:%s/users/1".formatted(port);
+    }
+
+    private MultiValueMap<String, String> loginForm() {
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("username", USERNAME);
+        formData.add("password", PASSWORD);
+        return formData;
+    }
+
+    private HttpHeaders formUrlEncodedHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        return headers;
+    }
+
+    private String extractCookies(HttpHeaders headers) {
+        List<String> cookies = headers.get(HttpHeaders.SET_COOKIE);
+        Assertions.assertNotNull(cookies, "После логина не был получен заголовок Set-Cookie");
+        Assertions.assertFalse(cookies.isEmpty(), "После логина список cookie пуст");
+        return cookies.stream()
+                .map(cookie -> cookie.split(";")[0].trim())
+                .collect(Collectors.joining("; "));
     }
 }
