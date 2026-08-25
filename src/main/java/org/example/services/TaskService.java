@@ -2,7 +2,6 @@ package org.example.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.utils.SecurityContextUtil;
 import org.example.dto.requests.ChangeWatcherRequest;
 import org.example.dto.requests.CreateTaskRequest;
 import org.example.dto.responses.TaskResponse;
@@ -12,10 +11,12 @@ import org.example.entities.UserEntity;
 import org.example.enums.TaskStatus;
 import org.example.exceptions.ForbiddenException;
 import org.example.exceptions.NoSuchEntityException;
+import org.example.mappers.TaskMapper;
 import org.example.pojo.User;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.TaskRepository;
 import org.example.repositories.UserRepository;
+import org.example.utils.SecurityContextUtil;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,6 +34,7 @@ public class TaskService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final SecurityContextUtil securityContextUtil;
+    private final TaskMapper taskMapper;
 
     public void createTask(CreateTaskRequest request) {
         log.info("Creating task...");
@@ -239,7 +241,7 @@ public class TaskService {
         UserDetails user = securityContextUtil.getCurrentUser()
                 .orElseThrow(() -> new AccessDeniedException("Authorization failed"));
         List<TaskEntity> taskEntities = taskRepository.findAllOpen(user.getUsername());
-        List<TaskResponse> taskResponses = taskEntities.stream().map(TaskResponse::new).toList();
+        List<TaskResponse> taskResponses = taskMapper.toDtoList(taskEntities);
         log.info("Found {} tasks", taskEntities.size());
         return taskResponses;
     }

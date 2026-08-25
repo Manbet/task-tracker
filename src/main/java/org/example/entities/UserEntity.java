@@ -16,9 +16,7 @@ import org.example.enums.Gender;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -57,13 +55,13 @@ public class UserEntity {
     private Gender gender;
 
     @OneToMany(mappedBy = "reporter")
-    private Set<TaskEntity> reportedTasks = new HashSet<>();
+    private List<TaskEntity> reportedTasks = new ArrayList<>();
 
     @OneToMany(mappedBy = "assignee")
-    private Set<TaskEntity> assignedTasks = new HashSet<>();
+    private List<TaskEntity> assignedTasks = new ArrayList<>();
 
     @ManyToMany(mappedBy = "watchers")
-    private Set<TaskEntity> watchedTasks = new HashSet<>();
+    private List<TaskEntity> watchedTasks = new ArrayList<>();
 
     @ManyToMany(mappedBy = "users")
     private List<ProjectEntity> projects = new ArrayList<>();

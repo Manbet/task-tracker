@@ -1,8 +1,11 @@
 package org.example.services;
 
+import org.example.mappers.TaskMapper;
 import org.example.config.SecurityConfig;
 import org.example.config.TestConfig;
+import org.example.dto.responses.TaskResponse;
 import org.example.dto.responses.UserResponse;
+import org.example.entities.UserEntity;
 import org.example.repositories.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
@@ -41,8 +45,11 @@ public class UserIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TaskMapper taskMapper;
 
     @Test
+    @Transactional(readOnly = true)
     public void testGetUserByIdWithRestTemplate() {
         String cookieHeader = loginWithForm(restTemplate);
         HttpHeaders headers = new HttpHeaders();
@@ -58,6 +65,7 @@ public class UserIntegrationTest {
     }
 
     @Test
+    @Transactional(readOnly = true)
     public void testGetUserByIdWithWebClient() {
         String cookieHeader = loginWithForm(restClient);
         final var response = restClient.get()
@@ -69,16 +77,21 @@ public class UserIntegrationTest {
     }
 
     private void assertUserResponse(ResponseEntity<UserResponse> response) {
-        final var expectedUser = userRepository.findWithTasksById(1L).orElse(null);
+        final UserEntity expectedUser = userRepository.findWithTasksById(1L).orElse(null);
         Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
-        final var body = response.getBody();
+        final UserResponse body = response.getBody();
         Assertions.assertNotNull(body);
         Assertions.assertNotNull(expectedUser);
         Assertions.assertEquals(expectedUser.getId(), body.getId());
         Assertions.assertEquals(expectedUser.getUsername(), body.getUsername());
-        Assertions.assertIterableEquals(expectedUser.getWatchedTasks(), body.getWaitingTasks());
-        Assertions.assertIterableEquals(expectedUser.getReportedTasks(), body.getReportedTasks());
-        Assertions.assertIterableEquals(expectedUser.getAssignedTasks(), body.getAssignedTasks());
+
+        List<TaskResponse> expectedWatched = taskMapper.toDtoList(expectedUser.getWatchedTasks());
+        List<TaskResponse> expectedReported = taskMapper.toDtoList(expectedUser.getReportedTasks());
+        List<TaskResponse> expectedAssigned = taskMapper.toDtoList(expectedUser.getAssignedTasks());
+
+        Assertions.assertIterableEquals(expectedWatched, body.getWaitingTasks());
+        Assertions.assertIterableEquals(expectedReported, body.getReportedTasks());
+        Assertions.assertIterableEquals(expectedAssigned, body.getAssignedTasks());
     }
 
     private String loginWithForm(TestRestTemplate template) {
