@@ -6,6 +6,7 @@ import org.example.config.TestConfig;
 import org.example.dto.responses.TaskResponse;
 import org.example.dto.responses.UserResponse;
 import org.example.entities.UserEntity;
+import org.example.mappers.UserMapper;
 import org.example.repositories.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,8 @@ public class UserIntegrationTest {
     private UserRepository userRepository;
     @Autowired
     private TaskMapper taskMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     @Test
     @Transactional(readOnly = true)
@@ -85,13 +88,11 @@ public class UserIntegrationTest {
         Assertions.assertEquals(expectedUser.getId(), body.getId());
         Assertions.assertEquals(expectedUser.getUsername(), body.getUsername());
 
-        List<TaskResponse> expectedWatched = taskMapper.toDtoList(expectedUser.getWatchedTasks());
-        List<TaskResponse> expectedReported = taskMapper.toDtoList(expectedUser.getReportedTasks());
-        List<TaskResponse> expectedAssigned = taskMapper.toDtoList(expectedUser.getAssignedTasks());
+        UserResponse expectedDto = userMapper.toDto(expectedUser);
 
-        Assertions.assertIterableEquals(expectedWatched, body.getWaitingTasks());
-        Assertions.assertIterableEquals(expectedReported, body.getReportedTasks());
-        Assertions.assertIterableEquals(expectedAssigned, body.getAssignedTasks());
+        Assertions.assertIterableEquals(expectedDto.getWaitingTasks(), body.getWaitingTasks());
+        Assertions.assertIterableEquals(expectedDto.getReportedTasks(), body.getReportedTasks());
+        Assertions.assertIterableEquals(expectedDto.getAssignedTasks(), body.getAssignedTasks());
     }
 
     private String loginWithForm(TestRestTemplate template) {
