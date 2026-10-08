@@ -2,17 +2,17 @@ package org.example.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.utils.SecurityContextUtil;
 import org.example.dto.requests.CreateProjectRequest;
 import org.example.dto.requests.ModifyProjectRequest;
 import org.example.dto.responses.ProjectResponse;
 import org.example.entities.ProjectEntity;
-import org.example.entities.UserEntity;
 import org.example.exceptions.ForbiddenException;
 import org.example.exceptions.NoSuchEntityException;
 import org.example.repositories.ProjectRepository;
-import org.example.repositories.UserRepository;
 import org.slf4j.MDC;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -23,103 +23,97 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectService {
     private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
+    private final SecurityContextUtil securityContextUtil;
 
-    @PreAuthorize("hasRole('ADMIN')")
     public void createProject(CreateProjectRequest createProjectRequest) {
         log.info("Creating project {}", createProjectRequest);
         ProjectEntity project = new ProjectEntity();
-        project.setName(createProjectRequest.getName());
-        project.setDescription(createProjectRequest.getDescription());
+        project.setName(createProjectRequest.name());
+        project.setDescription(createProjectRequest.description());
         project.setOpen(createProjectRequest.isOpened());
         projectRepository.save(project);
         log.info("Project {} created", project.getId());
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
-    public void deleteProject(long projectId, long userId) {
+    public void deleteProject(long projectId) {
         log.info("Deleting project with id {}", projectId);
         final ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("Project with id {0} not found", projectId)));
-        final UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("User with id {0} not found", userId)));
+        UserDetails user = securityContextUtil.getCurrentUser()
+                .orElseThrow(() -> new AccessDeniedException("Authorization failed"));
         if (project.getUsers().contains(user)) {
+//        if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
             project.setActive(false);
             projectRepository.save(project);
             log.info("Project {} deleted", projectId);
         } else {
-            log.warn("User with id {} tried to delete project with id {}", userId, projectId);
+            log.warn("User {} tried to delete project with id {}", user.getUsername(), projectId);
             throw new ForbiddenException(MessageFormat
-                    .format("User with id {0} is forbidden", userId));
+                    .format("User {0} is forbidden", user.getUsername()));
         }
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
-    public void modifyProject(long projectId, long userId, ModifyProjectRequest request) {
+    public void modifyProject(long projectId, ModifyProjectRequest request) {
         log.info("Modifying project with id {}", projectId);
         final ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("Project with id {0} not found", projectId)));
-        final UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("User with id {0} not found", userId)));
+        UserDetails user = securityContextUtil.getCurrentUser()
+                .orElseThrow(() -> new AccessDeniedException("Authorization failed"));
         if (project.getUsers().contains(user)) {
-            project.setName(request.getName());
-            project.setDescription(request.getDescription());
+//        if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
+            project.setName(request.name());
+            project.setDescription(request.description());
         } else {
-            log.warn("User with id {} tried to modify project with id {}", userId, projectId);
+            log.warn("User {} tried to modify project with id {}", user.getUsername(), projectId);
             throw new ForbiddenException(MessageFormat
-                    .format("User with id {0} is forbidden", userId));
+                    .format("User {0} is forbidden", user.getUsername()));
         }
-        MDC.clear();
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
-    public ProjectResponse getProjectById(long projectId, long userId) {
+    public ProjectResponse getProjectById(long projectId) {
         log.info("Getting project by id{}", projectId);
         final ProjectEntity projectEntity = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NoSuchEntityException(MessageFormat
                         .format("Project with id {0} does not exist", projectId)));
-        final UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("User with id {0} not found", userId)));
+        UserDetails user = securityContextUtil.getCurrentUser()
+                .orElseThrow(() -> new AccessDeniedException("Authorization failed"));
         if (projectEntity.isOpen() || projectEntity.getUsers().contains(user)) {
+//        if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
             log.info("Project {} found by id", projectEntity.getId());
             MDC.clear();
             return new ProjectResponse(projectEntity);
         } else {
-            log.warn("User with id {} tried to get project by id {}", userId, projectId);
+            log.warn("User {} tried to get project by id {}", user.getUsername(), projectId);
             throw new ForbiddenException(MessageFormat
-                    .format("User with id {0} is forbidden", userId));
+                    .format("User {0} is forbidden", user.getUsername()));
         }
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
-    public ProjectResponse getProjectByName(String name, long userId) {
+    public ProjectResponse getProjectByName(String name) {
         log.info("Getting project by name {}", name);
         final ProjectEntity project = projectRepository.findByName(name);
-        final UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                        .format("User with id {0} not found", userId)));
+        UserDetails user = securityContextUtil.getCurrentUser()
+                .orElseThrow(() -> new AccessDeniedException("Authorization failed"));
         if (project == null) {
             throw new NoSuchEntityException(MessageFormat
                     .format("Project with name {0} does not exist", name));
         } else if (project.isOpen() || project.getUsers().contains(user)) {
+//        } else if (securityContextUtil.hasAuthority("ROLE_ADMIN")) {
             log.info("Project {} found by name {}", project.getId(), project.getName());
             return new ProjectResponse(project);
         } else {
-            log.warn("User with id {} tried to get project by name {}", userId, project.getName());
+            log.warn("User {} tried to get project by name {}", user.getUsername(), project.getName());
             throw new ForbiddenException(MessageFormat
-                    .format("User with id {0} is forbidden", userId));
+                    .format("User {0} is forbidden", user.getUsername()));
         }
     }
 
-    @PreAuthorize("#userId == user.id or hasRole('ADMIN')")
-    public List<ProjectResponse> findAllProjects(long userId) {
+    public List<ProjectResponse> findAllProjects() {
         log.info("Finding all projects");
-        List<ProjectEntity> projects = projectRepository.findAllOpen(userId);
+        UserDetails user = securityContextUtil.getCurrentUser().orElse(null);
+        List<ProjectEntity> projects = projectRepository.findAllOpen(user.getUsername());
         List<ProjectResponse> projectResponses = projects.stream().map(ProjectResponse::new).toList();
         log.info("Found {} projects", projects.size());
         return projectResponses;

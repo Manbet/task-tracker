@@ -19,16 +19,14 @@ public class CommentController {
 
     @PutMapping("/comments/{commentId}")
     public void modifyComment(@Valid @PathVariable Long commentId,
-                              @Valid @RequestParam Long userId,
                               @Valid @RequestParam Long taskId,
                               @Valid @RequestParam String text) {
-        commentService.modifyComment(taskId, userId, commentId, text);
+        commentService.modifyComment(taskId, commentId, text);
     }
 
     @DeleteMapping("/comments/{commentId}")
     public void deleteComment(@Valid @PathVariable Long commentId,
-                              @Valid @RequestParam Long taskId,
-                              @Valid @RequestParam Long userId) {
-        commentService.deleteComment(commentId, taskId, userId);
+                              @Valid @RequestParam Long taskId) {
+        commentService.deleteComment(commentId, taskId);
     }
 }

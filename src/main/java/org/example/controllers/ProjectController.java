@@ -21,33 +21,29 @@ public class ProjectController {
     }
 
     @DeleteMapping("/project/{projectId}")
-    public void deleteProject(@Valid @PathVariable Long projectId,
-                              @Valid @RequestParam Long userId) {
-        projectService.deleteProject(projectId, userId);
+    public void deleteProject(@Valid @PathVariable Long projectId) {
+        projectService.deleteProject(projectId);
     }
 
     @PutMapping("/project/{projectId}")
     public void modifyProject(@Valid @PathVariable Long projectId,
-                              @Valid @RequestParam Long userId,
                               @Valid @RequestBody ModifyProjectRequest modifyProjectRequest) {
-        projectService.modifyProject(projectId, userId, modifyProjectRequest);
+        projectService.modifyProject(projectId, modifyProjectRequest);
     }
 
     @GetMapping("/project/{projectId}")
-    public ProjectResponse getProjectById(@Valid @PathVariable Long projectId,
-                                          @Valid @RequestParam Long userId) {
-        return projectService.getProjectById(projectId, userId);
+    public ProjectResponse getProjectById(@Valid @PathVariable Long projectId) {
+        return projectService.getProjectById(projectId);
     }
 
     @GetMapping("/project")
-    public ProjectResponse getProjectByName(@Valid @RequestParam String name,
-                                            @Valid @RequestParam Long userId) {
-        return projectService.getProjectByName(name, userId);
+    public ProjectResponse getProjectByName(@Valid @RequestParam String name) {
+        return projectService.getProjectByName(name);
     }
 
 
     @GetMapping("/projects")
-    public List<ProjectResponse> getAllProjects(@Valid @RequestParam Long userId) {
-        return projectService.findAllProjects(userId);
+    public List<ProjectResponse> getAllProjects() {
+        return projectService.findAllProjects();
     }
 }

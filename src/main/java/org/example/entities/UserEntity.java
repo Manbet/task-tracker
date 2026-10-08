@@ -1,11 +1,20 @@
 package org.example.entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.enums.Gender;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +27,9 @@ public class UserEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column(name = "username")
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
 
     @Column(name = "name")
@@ -32,17 +41,14 @@ public class UserEntity {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "email")
+    @Column(name = "email",  unique = true)
     private String email;
 
     @Column(name = "birth_date")
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "is_active")
     private boolean isActive;
-
-    @Column(name = "token_expired")
-    private boolean tokenExpired;
 
     @Column(name = "gender")
     @Enumerated(EnumType.STRING)
@@ -60,11 +66,7 @@ public class UserEntity {
     @ManyToMany(mappedBy = "users")
     private List<ProjectEntity> projects = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "roles_users",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
-    )
-    private List<RoleEntity> roles = new ArrayList<>();
+//    @Column(name = "role")
+//    @Enumerated(EnumType.STRING)
+//    private UserRole role;
 }

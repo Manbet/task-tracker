@@ -6,6 +6,8 @@ import org.example.entities.CommentEntity;
 import org.example.entities.TaskEntity;
 import org.example.entities.UserEntity;
 import org.example.exceptions.NoSuchEntityException;
+import org.example.dto.EmailMessage;
+import org.example.services.KafkaProducerService;
 import org.example.repositories.TaskRepository;
 import org.example.repositories.UserRepository;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,20 +24,26 @@ import java.util.List;
 public class TaskJobs {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final KafkaProducerService kafkaProducerService;
 
     @Scheduled(cron = "${application.jobs.notify-deadlines.cron:0 0 0 * * *}")
     public void notifyDeadlines() {
         log.info("Notifying deadlines");
-        taskRepository.findDeadlines();
+        LocalDateTime now = LocalDateTime.now();
         List<TaskEntity> dueTasks = taskRepository.findDeadlines();
+        Long systemUserId = 1L;
+        final UserEntity author = userRepository.findById(systemUserId)
+                .orElseThrow(() -> new NoSuchEntityException(MessageFormat
+                        .format("User with id {0} not found", systemUserId)));
         for (TaskEntity task : dueTasks) {
-            long duration = Duration.between(LocalDateTime.now(), task.getDueTime()).toDays();
-            final UserEntity author = userRepository.findById(0L)
-                    .orElseThrow(() -> new NoSuchEntityException(MessageFormat
-                    .format("User with id {0} not found", 0L)));
-            CommentEntity comment = new CommentEntity(author, duration + " Days till deadline", task,
-                    LocalDateTime.now(), LocalDateTime.now());
+            long duration = Duration.between(now, task.getDueTime()).toDays();
+            String message = duration + " Days till " + task.getTitle() + " deadline";
+            CommentEntity comment = new CommentEntity(author, message, task,
+                    now, LocalDateTime.now());
             task.getComments().add(comment);
+            kafkaProducerService.sendEmail(new EmailMessage(
+                    task.getReporter().getEmail(), "Deadline notification",
+                    message, now));
             taskRepository.save(task);
         }
     }

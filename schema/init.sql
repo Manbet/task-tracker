@@ -1,6 +1,6 @@
 create table if not exists tasks
 (
-    id               bigserial,
+    id               bigserial primary key,
     title            varchar(255)                not null,
     description      text,
     comments         bigint[],
@@ -15,21 +15,21 @@ create table if not exists tasks
 
 create table if not exists users
 (
-    id            bigserial,
-    username      varchar(255) not null,
-    name          varchar(255),
-    surname       varchar(255),
-    password      varchar(255) not null,
-    email         varchar(100) not null,
-    gender        varchar(10)  not null,
-    birth_date    timestamp without time zone,
-    is_active     boolean      not null,
-    token_expired boolean
+    id         bigserial primary key,
+    username   varchar(255) not null,
+    name       varchar(255),
+    surname    varchar(255),
+    email      varchar(255) not null,
+    password   varchar(255) not null,
+    gender     varchar(255) not null,
+    birth_date date,
+--     role       varchar(255) not null,
+    is_active  boolean
 );
 
 create table if not exists projects
 (
-    id          bigserial,
+    id          bigserial primary key,
     name        varchar(255) not null,
     is_active   boolean      not null,
     is_open     boolean      not null,
@@ -38,24 +38,12 @@ create table if not exists projects
 
 create table if not exists comments
 (
-    id               bigserial,
+    id               bigserial primary key,
     text             text                        not null,
     creation_time    timestamp without time zone not null,
     last_update_time timestamp without time zone not null,
     author           bigint,
     task             bigint                      not null
-);
-
-create table if not exists roles
-(
-    id   bigserial,
-    name varchar(255) not null
-);
-
-create table if not exists privileges
-(
-    id   bigserial,
-    name varchar(255) not null
 );
 
 create table if not exists task_watchers
@@ -72,63 +60,37 @@ create table if not exists project_users
     primary key (project_id, user_id)
 );
 
-create table if not exists roles_users
+create table if not exists user_roles
 (
-    user_id bigint not null,
-    role_id bigint not null,
-    primary key (user_id, role_id)
+    user_id bigint       not null primary key,
+    role    varchar(255) not null
 );
 
-
-create table if not exists roles_privileges
+create table spring_session
 (
-    role_id      bigint not null,
-    privilege_id bigint not null,
-    primary key (role_id, privilege_id)
+    primary_id            char(36) not null,
+    session_id            char(36) not null,
+    creation_time         bigint   not null,
+    last_access_time      bigint   not null,
+    max_inactive_interval int      not null,
+    expiry_time           bigint   not null,
+    principal_name        varchar(100),
+    constraint spring_session_PK primary key (primary_id)
 );
 
---1, 2, 3, 4
---5, 6
+create unique index spring_session_ix1 on spring_session (session_id);
+create index spring_session_ix2 on spring_session (expiry_time);
+create index spring_session_ix3 on spring_session (principal_name);
 
---one to
---table task
---reporter | assignee
---1        | 4
---2        | 1
---3        | 4
---4        | 3
---1        | 2
---4        | 1
+create table spring_session_attributes
+(
+    session_primary_id char(36)     not null,
+    attribute_name     varchar(200) not null,
+    attribute_bytes    bytea        not null,
+    constraint spring_session_attributes_PK primary key (session_primary_id, attribute_name),
+    constraint spring_session_attributes_FK foreign key (session_primary_id) references spring_session (primary_id) on delete cascade
+);
 
-select *
-from tasks t
-         join users u on t.reporter = u.id
-where u.name = 'Павел';
-select *
-from tasks t
-         join users u on t.assignee = u.id
-where u.name = 'Петр';
-
---many to many
---task_id | user_id
---5       | 1
---5       | 2
---5       | 3
---5       | 4
---6       | 1
---6       | 4
-
-select t.*
-from tasks t
-         join task_watchers tw on t.id = tw.task_id
-         join users u on tw.user_id = u.id
-where u.name = 'Эмин';
-
-select u.*
-from tasks t
-         join task_watchers tw on t.id = tw.task_id
-         join users u on tw.user_id = u.id
-where t.title = 'разбор ошибок';
-
-insert into users (id, username, password, email, gender, is_active)
-values (0, 'bot', 'system_user', 'bot@applitcation.com', 'SYSTEM', true)
+insert into users (username, gender, password, email, is_active)
+values ('bot', 'SYSTEM', '$2a$10$XURPShQNCsLjp1ESc2laoOLHTDCW9B7UKelSiEPZaLqLKjz.baF3K', 'bot@mail.com', true)
+returning id;
